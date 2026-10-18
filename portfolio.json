@@ -18,7 +18,7 @@
     },
     {
       "label": "LinkedIn",
-      "url": "https://www.linkedin.com/in/vaibhavbarman/",
+      "url": "",
       "svg_path": "img/linkedin.svg"
     },
     {
@@ -146,42 +146,42 @@
     },
     {
       "name": "LLM Applications and Prompt Engineering",
-      "proficiency": 80,
+      "proficiency": 95,
       "proficiency_label": "Project experience"
     },
     {
       "name": "Retrieval-Augmented Generation (RAG)",
-      "proficiency": 55,
+      "proficiency": 75,
       "proficiency_label": "Project experience"
     },
     {
       "name": "AI Agents and Agent Workflows",
-      "proficiency": 55,
+      "proficiency": 75,
       "proficiency_label": "Project experience"
     },
     {
       "name": "FastAPI",
-      "proficiency": 55,
+      "proficiency": 85,
       "proficiency_label": "Project experience"
     },
     {
       "name": "SQL and PostgreSQL",
-      "proficiency": 70,
+      "proficiency": 80,
       "proficiency_label": "Project experience"
     },
     {
       "name": "MCP and FastMCP",
-      "proficiency": 45,
+      "proficiency": 90,
       "proficiency_label": "Project experience"
     },
     {
       "name": "Git and GitHub",
-      "proficiency": 65,
+      "proficiency": 100,
       "proficiency_label": "Working knowledge"
     },
     {
       "name": "Ollama and Local LLMs",
-      "proficiency": 55,
+      "proficiency": 95,
       "proficiency_label": "Project experience"
     }
   ],
@@ -200,6 +200,26 @@
       "name": "Local-First AI",
       "summary": "Experimenting with locally hosted models and privacy-focused AI workflows that reduce reliance on cloud inference.",
       "images": []
+    },
+    {
+      "name": "Gym and Fitness",
+      "summary": "I enjoy strength training, staying consistent with fitness, and improving my performance over time.",
+      "images": []
+    },
+    {
+      "name": "Marathon Running",
+      "summary": "I enjoy challenging myself through running and endurance events. Race medals: 🥇 10 km : Run for Humanity; 🥈 5 km : JECRC's Martyr's Run.",
+      "images": []
+    },
+    {
+      "name": "Books and Reading",
+      "summary": "I enjoy reading books to explore new ideas, learn continuously, and broaden my perspective.",
+      "images": []
+    },
+    {
+      "name": "Piano",
+      "summary": "I enjoy piano and the process of learning music through regular practice.",
+      "images": []
     }
   ],
   "languages": [
@@ -212,5 +232,20 @@
       "fluency": "Fluent"
     }
   ],
-  "references": []
+  "references": [],
+  "marathon": {
+    "title": "Marathon",
+    "medals": [
+      {
+        "distance": "10 km",
+        "event": "Run for Humanity",
+        "medal": "Medal"
+      },
+      {
+        "distance": "5 km",
+        "event": "JECRC's Martyr's Run",
+        "medal": "Medal"
+      }
+    ]
+  }
 }
