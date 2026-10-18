@@ -1,4 +1,4 @@
-# Vaibhav Barman — AI Engineer Portfolio
+# Vaibhav Barman : AI Engineer Portfolio
 
 A personal portfolio and résumé website showcasing AI engineering projects, technical skills, education, and links to professional profiles. The site is generated from a single JSON data file and deployed with GitHub Pages.
 
