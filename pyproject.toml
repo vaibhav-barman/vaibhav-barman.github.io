@@ -1,0 +1,8 @@
+[project]
+name = "vaibhav-barman-github-io"
+version = "0.1.0"
+requires-python = ">=3.14"
+dependencies = [
+    "jinja2==3.1.4",
+    "markupsafe==3.0.2",
+]
