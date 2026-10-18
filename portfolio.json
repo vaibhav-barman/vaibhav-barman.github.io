@@ -18,7 +18,7 @@
     },
     {
       "label": "LinkedIn",
-      "url": "",
+      "url": "https://www.linkedin.com/in/vaibhavbarman/",
       "svg_path": "img/linkedin.svg"
     },
     {
@@ -133,7 +133,7 @@
         "B.Sc. in Computer Science"
       ],
       "honors": [],
-      "gpa_cumulative": "",
+      "gpa_cumulative": "7.99/10",
       "gpa_major": "",
       "graduation_date": "Expected 2027"
     }
