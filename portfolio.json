@@ -52,7 +52,7 @@
       "images": []
     },
     {
-      "title": "Recovery — AI Payment Recovery Agent",
+      "title": "Recovery : AI Payment Recovery Agent",
       "summary": "An AI agent prototype that classifies failed payments, selects a recovery strategy, simulates outcomes, and adapts later decisions using historical performance.",
       "url": "https://github.com/vaibhav-barman/recovery-agent",
       "highlights": [
