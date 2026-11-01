@@ -29,6 +29,8 @@ interface AppState {
   /** Whether WebGL works on this device ('unknown' until checked). */
   webgl: 'unknown' | 'ok' | 'failed'
   sceneReady: boolean
+  /** 3D waits for the first interaction (phones) instead of loading at startup. */
+  sceneDeferred: boolean
   activeSection: SectionId
   progress: number
   highlight: Highlight
@@ -66,6 +68,7 @@ export const useApp = create<AppState>((set) => ({
   threeD: readPref('3d', ['on', 'off'], 'on') === 'on',
   webgl: 'unknown',
   sceneReady: false,
+  sceneDeferred: false,
   activeSection: 'hero',
   progress: 0,
   highlight: null,

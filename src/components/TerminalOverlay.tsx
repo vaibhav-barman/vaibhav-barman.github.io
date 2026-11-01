@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, m } from 'framer-motion'
 import { useEffect, useRef } from 'react'
 import { config } from '../config'
 import { useReducedMotion } from '../hooks/useMedia'
@@ -36,7 +36,7 @@ export function TerminalOverlay() {
   return (
     <AnimatePresence>
       {open && (
-        <motion.div
+        <m.div
           key="term-overlay"
           role="dialog"
           aria-modal="false"
@@ -64,7 +64,7 @@ export function TerminalOverlay() {
               </button>
             }
           />
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   )

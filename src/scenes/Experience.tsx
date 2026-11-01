@@ -54,7 +54,7 @@ export default function Experience({ mobile, reduced }: ExperienceProps) {
   }, [])
 
   const hero = anchor('hero')
-  const corePos: [number, number, number] = wide ? [hero[0] + 0.4, hero[1] + 0.2, hero[2]] : [hero[0], hero[1] + 1.8, hero[2] - 3]
+  const corePos: [number, number, number] = wide ? [hero[0] + 0.4, hero[1] + 0.2, hero[2]] : [hero[0] + 0.6, hero[1] + 3.4, hero[2] - 8]
 
   const [portalReady, setPortalReady] = useState(false)
   const attachPortal = (el: HTMLDivElement | null) => {

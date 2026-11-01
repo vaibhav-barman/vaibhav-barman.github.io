@@ -147,7 +147,10 @@ export function Terminal({
     setColumns(Math.floor(((scrollRef.current?.clientWidth ?? 640) - 24) / 7.9))
     void submit(cmd, variant)
     histIdx.current = null
-    inputRef.current?.focus({ preventScroll: true })
+    // Don't summon the on-screen keyboard when a chip/link is tapped on touch devices.
+    if (!window.matchMedia('(pointer: coarse)').matches || document.activeElement === inputRef.current) {
+      inputRef.current?.focus({ preventScroll: true })
+    }
   }
 
   const set = (v: string) => {

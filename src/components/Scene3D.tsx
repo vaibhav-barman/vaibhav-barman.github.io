@@ -56,8 +56,21 @@ export function Scene3D() {
     }
     if (explicit !== 'on' && isSoftwareRenderer()) useApp.setState({ threeD: false })
 
-    // Start loading the 3D chunk once the main thread is free.
     const start = () => setIdle(true)
+
+    // Phones: don't spend battery/CPU on the scene until the visitor engages.
+    if (window.matchMedia('(max-width: 767px), (pointer: coarse)').matches) {
+      useApp.setState({ sceneDeferred: true })
+      const events = ['scroll', 'touchstart', 'pointerdown', 'keydown'] as const
+      const go = () => {
+        events.forEach((e) => window.removeEventListener(e, go))
+        start()
+      }
+      events.forEach((e) => window.addEventListener(e, go, { passive: true, once: true }))
+      return () => events.forEach((e) => window.removeEventListener(e, go))
+    }
+
+    // Desktop: start loading the 3D chunk once the main thread is free.
     const ric = window.requestIdleCallback
     if (ric) {
       const id = ric(start, { timeout: 1500 })

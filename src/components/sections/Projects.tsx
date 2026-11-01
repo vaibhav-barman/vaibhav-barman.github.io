@@ -10,7 +10,7 @@ export function Projects() {
   return (
     <Section id="projects" eyebrow={`~/projects · ${d.projects.length} entries`}>
       <p className="mb-6 max-w-lg text-muted">
-        Agentic and AI-first work leads. Select a project here or a card in the scene for details.
+        Agentic and AI-first work leads. Select a project<span className="hidden lg:inline"> here or a card in the scene</span> for details.
       </p>
       <ol className="space-y-2">
         {d.projects.map((p) => {

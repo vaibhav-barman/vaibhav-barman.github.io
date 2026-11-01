@@ -5,6 +5,9 @@ import { Journey } from './components/sections/Journey'
 import { Projects } from './components/sections/Projects'
 import { Skills } from './components/sections/Skills'
 import { TerminalSection } from './components/sections/TerminalSection'
+import { LazyMotion, domAnimation } from 'framer-motion'
+import { Cursor } from './components/Cursor'
+import { Footer } from './components/Footer'
 import { Hud } from './components/Hud'
 import { Loader } from './components/Loader'
 import { Scene3D } from './components/Scene3D'
@@ -17,7 +20,7 @@ export function App() {
   useScrollTracker()
   useTerminalHotkey()
   return (
-    <>
+    <LazyMotion features={domAnimation} strict>
       <ThemeSync />
       <div className="fallback-bg" aria-hidden="true" />
       <Scene3D />
@@ -33,9 +36,11 @@ export function App() {
         <TerminalSection />
         <Contact />
       </main>
+      <Footer />
       <TerminalOverlay />
       <ProjectDialog />
       <Loader />
-    </>
+      <Cursor />
+    </LazyMotion>
   )
 }

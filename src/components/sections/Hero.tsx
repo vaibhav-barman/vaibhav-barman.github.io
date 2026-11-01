@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+import { m } from 'framer-motion'
 import { portfolio as d } from '../../data/portfolio'
 import { useApp } from '../../store/useApp'
 import { scrollToSection } from '../../hooks/useScrollTracker'
@@ -15,7 +15,7 @@ export function Hero() {
       aria-labelledby="hero-title"
       className="relative z-10 flex min-h-[100svh] flex-col justify-center px-4 pt-24 pb-16 sm:px-8 lg:px-16"
     >
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: [0.2, 0.7, 0.2, 1] }}
@@ -64,7 +64,7 @@ export function Hero() {
         <p className="mt-8 hidden font-mono text-xs text-muted sm:block">
           press <Kbd>{config.terminal.toggleKey}</Kbd> anywhere to toggle the terminal
         </p>
-      </motion.div>
+      </m.div>
 
       <div aria-hidden="true" className="absolute bottom-8 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 font-mono text-[10px] tracking-[0.3em] text-muted uppercase sm:flex">
         scroll · enter latent space

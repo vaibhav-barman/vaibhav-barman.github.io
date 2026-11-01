@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, m } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import { portfolio as d } from '../data/portfolio'
 import { useReducedMotion } from '../hooks/useMedia'
@@ -13,11 +13,17 @@ export function Loader() {
   const sceneReady = useApp((s) => s.sceneReady)
   const threeD = useApp((s) => s.threeD)
   const webgl = useApp((s) => s.webgl)
+  const deferred = useApp((s) => s.sceneDeferred)
   const reduce = useReducedMotion()
   const [show, setShow] = useState(true)
   const [pct, setPct] = useState(0)
 
-  const noScene = webgl === 'failed' || (webgl === 'ok' && !threeD)
+  const noScene = webgl === 'failed' || (webgl === 'ok' && !threeD) || deferred
+
+  // Hand over from the static boot screen painted by index.html.
+  useEffect(() => {
+    document.getElementById('boot')?.remove()
+  }, [])
 
   useEffect(() => {
     if (sceneReady || noScene) {
@@ -42,7 +48,7 @@ export function Loader() {
   return (
     <AnimatePresence>
       {show && (
-        <motion.div
+        <m.div
           key="loader"
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -65,7 +71,7 @@ export function Loader() {
               <span>click to skip</span>
             </p>
           </div>
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   )
