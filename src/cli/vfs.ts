@@ -35,7 +35,8 @@ export class VFS {
   /** Resolve `target` relative to `cwd`. Returns a canonical path like "~/projects". */
   resolve(cwd: string, target = ''): string {
     const t = target.trim()
-    const parts = t === '' || t === '~' ? [] : t.startsWith('~/') || t.startsWith('/') ? t.replace(/^~?\//, '').split('/') : [...this.segments(cwd), ...t.split('/')]
+    if (t === '' || t === '.') return this.resolve(HOME, cwd)
+    const parts = t === '~' ? [] : t.startsWith('~/') || t.startsWith('/') ? t.replace(/^~?\//, '').split('/') : [...this.segments(cwd), ...t.split('/')]
     const out: string[] = []
     for (const p of parts) {
       if (!p || p === '.') continue

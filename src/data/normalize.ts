@@ -91,11 +91,25 @@ export function slugify(input: string): string {
 }
 
 function socialKey(label: string, url: string): string {
-  const l = `${label} ${url}`.toLowerCase()
-  for (const k of ['github', 'linkedin', 'twitter', 'x.com', 'youtube', 'mastodon', 'bluesky', 'instagram']) {
-    if (l.includes(k)) return k === 'x.com' ? 'twitter' : k
+  const l = label.toLowerCase()
+  let host = ''
+  try {
+    host = new URL(url).hostname.replace(/^www\./, '')
+  } catch {
+    /* not a URL */
   }
-  if (l.includes('website') || l.includes('site')) return 'website'
+  const known: Record<string, string> = {
+    'github.com': 'github',
+    'linkedin.com': 'linkedin',
+    'x.com': 'twitter',
+    'twitter.com': 'twitter',
+    'youtube.com': 'youtube',
+    'bsky.app': 'bluesky',
+    'instagram.com': 'instagram',
+  }
+  if (known[host]) return known[host]
+  for (const k of ['github', 'linkedin', 'twitter', 'youtube', 'mastodon', 'bluesky', 'instagram']) if (l.includes(k)) return k
+  if (l.includes('website') || l.includes('site') || l.includes('blog')) return 'website'
   return slugify(label)
 }
 
