@@ -49,3 +49,6 @@ export function rng(seed = 1) {
 export function anchor(id: string): [number, number, number] {
   return config.scene.anchors[id] ?? [0, 0, 0]
 }
+
+/** Fixed DOM layer for drei <Html> labels (the default target, #root, scrolls with the page). */
+export const labelPortal: { current: HTMLElement } = { current: null as unknown as HTMLElement }
