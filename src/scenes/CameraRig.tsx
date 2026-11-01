@@ -3,7 +3,7 @@ import { easing } from 'maath'
 import { useMemo } from 'react'
 import { Vector3 } from 'three'
 import { config } from '../config'
-import { scrollState } from '../store/useApp'
+import { scrollState, useApp } from '../store/useApp'
 
 /** Sections that span the full width get a centred camera; others shift the scene right of the text column. */
 const FULL_WIDTH = new Set(['terminal'])
@@ -23,7 +23,7 @@ export function CameraRig({ reduced, wide }: { reduced: boolean; wide: boolean }
     [],
   )
   const offset = useMemo(() => new Vector3(...config.scene.cameraOffset), [])
-  const tmp = useMemo(() => ({ pos: new Vector3(), look: new Vector3(), lookCur: new Vector3(0, 0, -10), first: true }), [])
+  const tmp = useMemo(() => ({ pos: new Vector3(), look: new Vector3(), lookCur: new Vector3(0, 0, -10), first: true, side: 2.7 }), [])
 
   useFrame((_, dt) => {
     const i = Math.min(scrollState.index, stops.length - 1)
@@ -32,7 +32,12 @@ export function CameraRig({ reduced, wide }: { reduced: boolean; wide: boolean }
     const raw = scrollState.t
     const k = raw * raw * (3 - 2 * raw) // smoothstep
     tmp.look.lerpVectors(a.pos, b.pos, k)
-    const shift = (a.shift + (b.shift - a.shift) * k) * (wide ? 2.7 : 0)
+    // Column sections push the focus right of the text; with the terminal
+    // overlay docked on the right, recompose so the focus sits left of it.
+    const column = a.shift + (b.shift - a.shift) * k
+    const target = useApp.getState().terminalOpen ? -2.4 : column * 2.7
+    tmp.side += (target - tmp.side) * (reduced ? 1 : 1 - Math.exp(-Math.min(dt, 0.05) * 3))
+    const shift = wide ? tmp.side : 0
     tmp.look.x -= shift
     tmp.pos.copy(tmp.look).add(offset)
 

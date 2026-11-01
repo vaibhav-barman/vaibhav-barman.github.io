@@ -59,6 +59,8 @@ interface AppState {
   markBooted(): void
 }
 
+let highlightTimer: ReturnType<typeof setTimeout> | undefined
+
 export const useApp = create<AppState>((set) => ({
   theme: readPref<ThemeName>('theme', Object.keys(config.themes) as ThemeName[], config.defaultTheme),
   threeD: readPref('3d', ['on', 'off'], 'on') === 'on',
@@ -86,7 +88,11 @@ export const useApp = create<AppState>((set) => ({
   setSceneReady: () => set({ sceneReady: true }),
   setSection: (activeSection) => set((s) => (s.activeSection === activeSection ? s : { activeSection })),
   setProgress: (progress) => set((s) => (Math.abs(s.progress - progress) < 0.002 ? s : { progress })),
-  setHighlight: (highlight) => set({ highlight, highlightAt: performance.now() }),
+  setHighlight: (highlight) => {
+    clearTimeout(highlightTimer)
+    set({ highlight, highlightAt: performance.now() })
+    if (highlight) highlightTimer = setTimeout(() => set({ highlight: null }), 6000)
+  },
   setFocusProject: (focusProject) => set({ focusProject }),
   setDetailProject: (detailProject) => set({ detailProject }),
   setHoverSkill: (hoverSkill) => set({ hoverSkill }),

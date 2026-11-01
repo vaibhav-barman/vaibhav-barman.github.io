@@ -119,6 +119,9 @@ function Card({ project, angle, radius, interactive }: { project: Project; angle
     const s = useApp.getState()
     const focused = s.focusProject === project.slug
     const active = focused || hovered.current
+    // `projects` command: a short wave of light across every card.
+    const since = s.highlight?.kind === 'projects' && !s.highlight.slug ? (performance.now() - s.highlightAt) / 1000 : 99
+    const wave = since < 2 ? Math.max(0, 1 - Math.abs(since * 1.6 - project.index * 0.12)) : 0
     const g = tilt.current
     if (!g || !face.current) return
     // Depth-based fade: cards at the back of the ring recede.
@@ -128,8 +131,8 @@ function Card({ project, angle, radius, interactive }: { project: Project; angle
     const base = interactive ? 0.25 + 0.75 * Math.max(0, (front + 1) / 2) : 0.35
     const d = Math.min(dt, 0.05)
     if (mat.current) easing.damp(mat.current, 'opacity', active ? 1 : base, 0.2, d)
-    frame.current?.color.copy(active ? palette.accent : palette.accent2)
-    if (frame.current) easing.damp(frame.current, 'opacity', active ? 1 : base * 0.5, 0.2, d)
+    frame.current?.color.copy(active || wave > 0.3 ? palette.accent : palette.accent2)
+    if (frame.current) easing.damp(frame.current, 'opacity', active ? 1 : Math.max(base * 0.5, wave), 0.12, d)
     const tx = hovered.current ? (pointerUv.current.y - 0.5) * -0.35 : 0
     const ty = hovered.current ? (pointerUv.current.x - 0.5) * 0.45 : 0
     easing.damp(g.rotation, 'x', tx, 0.15, d)

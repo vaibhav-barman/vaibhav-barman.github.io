@@ -88,7 +88,7 @@ export const skills: Command = {
     actions.goTo('skills')
     actions.highlight({ kind: 'skills', group: groups.length === 1 ? groups[0].slug : undefined })
     const narrow = actions.isNarrow()
-    const width = Math.min(34, Math.max(...d.skills.map((s) => s.name.length)) + 2)
+    const width = Math.min(30, Math.max(...d.skills.map((s) => s.name.length)) + 2)
     const out: Line[] = []
     for (const g of groups) {
       out.push(heading(g.name))
@@ -97,7 +97,8 @@ export const skills: Command = {
           out.push([t(s.name)])
           out.push([t('  ' + bar(s.level, 14), 'accent'), t(` ${s.level}%`, 'muted')])
         } else {
-          out.push([t(pad(s.name, width)), t(bar(s.level), 'accent'), t(` ${String(s.level).padStart(3)}%`, 'muted')])
+          const name = s.name.length > width - 1 ? s.name.slice(0, width - 2) + '…' : s.name
+          out.push([t(pad(name, width)), t(bar(s.level), 'accent'), t(` ${String(s.level).padStart(3)}%`, 'muted')])
         }
       }
       out.push(blank)
