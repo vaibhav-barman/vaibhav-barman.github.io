@@ -1,7 +1,9 @@
 {
   "name": "Vaibhav Barman",
   "label": "AI Engineer | LLM Applications, RAG & AI Agents",
-  "image_path": "img/profile.png",
+  "tagline": "I build LLM applications, RAG pipelines and agentic workflows that run reliably, often on local models.",
+  "status": "open to remote roles",
+  "image_path": "img/profile.jpg",
   "contact": {
     "email": "vaibhavbarman2609@gmail.com",
     "phone": "",
@@ -30,9 +32,41 @@
   "work_experience": [],
   "projects": [
     {
+      "title": "GitCommit AI",
+      "summary": "An agentic, repository-aware Git commit assistant (git ai-commit) that learns how a repository writes commits and drafts messages in that style, checked by a deterministic critic before you see them.",
+      "url": "https://github.com/vaibhav-barman/gitcommit-ai",
+      "featured": true,
+      "category": "agentic",
+      "tags": [
+        "LangGraph",
+        "Python",
+        "Multi-agent",
+        "OpenAI",
+        "Anthropic",
+        "Gemini",
+        "Ollama"
+      ],
+      "highlights": [
+        "Detects the repository's commit convention and style profile from recent history, with a confidence score.",
+        "A critic loop checks each draft against deterministic rules plus an LLM faithfulness check, and regenerates until it passes.",
+        "Never stages files and refuses to commit if the staging area or HEAD changed while it was working.",
+        "Supports OpenAI, Anthropic, Gemini and local Ollama models, with an evaluation harness that replays your own history."
+      ],
+      "images": []
+    },
+    {
       "title": "LocalForge-AI",
       "summary": "An autonomous, local-first multi-agent software development and QA engine built with LangGraph and Ollama. It coordinates task specification, code generation, execution, and repair workflows on a local machine.",
       "url": "https://github.com/vaibhav-barman/localforge-ai",
+      "featured": true,
+      "category": "agentic",
+      "tags": [
+        "LangGraph",
+        "Ollama",
+        "Python",
+        "Multi-agent",
+        "Local LLMs"
+      ],
       "highlights": [
         "Uses specialized agents for specification, implementation, and verification stages.",
         "Feeds concrete execution, linting, and test failures back into a code-repair loop.",
@@ -44,6 +78,15 @@
       "title": "PromptRoute",
       "summary": "An LLM-native travel itinerary planner that generates structured, time-slotted travel plans using a local Ollama model and an interactive React interface.",
       "url": "https://github.com/vaibhav-barman/promptroute",
+      "featured": false,
+      "category": "llm",
+      "tags": [
+        "Ollama",
+        "React",
+        "Vite",
+        "Tailwind CSS",
+        "Structured output"
+      ],
       "highlights": [
         "Explores a Backend-as-a-Prompt architecture that returns structured JSON without a conventional application server or database.",
         "Connects local model output to an interactive frontend built with React, Vite, and Tailwind CSS.",
@@ -55,6 +98,15 @@
       "title": "Recovery : AI Payment Recovery Agent",
       "summary": "An AI agent prototype that classifies failed payments, selects a recovery strategy, simulates outcomes, and adapts later decisions using historical performance.",
       "url": "https://github.com/vaibhav-barman/recovery-agent",
+      "featured": true,
+      "category": "agentic",
+      "tags": [
+        "AI Agents",
+        "FastAPI",
+        "React",
+        "SQLite",
+        "Groq"
+      ],
       "highlights": [
         "Uses LLM reasoning to classify payment-failure context and choose a recovery action.",
         "Records simulated outcomes and feeds strategy-performance history into subsequent decisions.",
@@ -71,6 +123,15 @@
       "title": "Odyssey RAG",
       "summary": "A retrieval-augmented question-answering system that answers questions about Homer's The Odyssey using relevant passages retrieved from the source text.",
       "url": "https://github.com/vaibhav-barman/odyssey-rag",
+      "featured": true,
+      "category": "rag",
+      "tags": [
+        "RAG",
+        "Gemini",
+        "Embeddings",
+        "Evaluation",
+        "Python"
+      ],
       "highlights": [
         "Processes a source document into overlapping chunks and retrieves relevant passages using embedding similarity.",
         "Uses Gemini embeddings and Gemini for grounded answer generation.",
@@ -82,6 +143,14 @@
       "title": "Local YouTube Video Summarizer",
       "summary": "A privacy-focused tool that transcribes YouTube video audio and creates concise summaries using Whisper and a locally hosted language model through Ollama.",
       "url": "https://github.com/vaibhav-barman/youtube-video-summarizer",
+      "featured": false,
+      "category": "llm",
+      "tags": [
+        "Whisper",
+        "Ollama",
+        "Gradio",
+        "Python"
+      ],
       "highlights": [
         "Uses Whisper for audio transcription and Ollama for local LLM summarization.",
         "Provides command-line and Gradio web-interface workflows.",
@@ -93,6 +162,14 @@
       "title": "GNews MCP Server",
       "summary": "A Model Context Protocol server that exposes news search and top-headline retrieval tools for AI assistants.",
       "url": "https://github.com/vaibhav-barman/gnews-mcp-server",
+      "featured": false,
+      "category": "tooling",
+      "tags": [
+        "MCP",
+        "FastMCP",
+        "Python",
+        "uv"
+      ],
       "highlights": [
         "Implements MCP tools for searching news articles and retrieving top headlines.",
         "Supports configurable language, country, category, date range, sorting, and result limits.",
@@ -104,6 +181,15 @@
       "title": "ApplyIQ",
       "summary": "An AI-powered job application intelligence platform that compares a candidate's resume with a job description to surface ATS compatibility, missing skills, and potential recruiter concerns.",
       "url": "https://github.com/vaibhav-barman/apply-iq",
+      "featured": false,
+      "category": "llm",
+      "tags": [
+        "Gemini",
+        "FastAPI",
+        "React",
+        "TypeScript",
+        "PostgreSQL"
+      ],
       "highlights": [
         "Integrates Gemini-based resume and job-description analysis into a full-stack application.",
         "Uses a React, TypeScript, Vite, and Tailwind CSS frontend with a Python FastAPI backend.",
@@ -115,6 +201,13 @@
       "title": "Gemini Website Summarizer",
       "summary": "A Python application that extracts readable content from a webpage and uses Google's Gemini API to generate a concise Markdown summary.",
       "url": "https://github.com/vaibhav-barman/gemini-website-summarizer",
+      "featured": false,
+      "category": "llm",
+      "tags": [
+        "Gemini",
+        "BeautifulSoup",
+        "Python"
+      ],
       "highlights": [
         "Fetches webpages with Requests and parses readable content with BeautifulSoup.",
         "Uses the Google Gen AI SDK to generate summaries.",
@@ -142,47 +235,56 @@
     {
       "name": "Python",
       "proficiency": 90,
-      "proficiency_label": "Project experience"
+      "proficiency_label": "Project experience",
+      "category": "Languages & Data"
     },
     {
       "name": "LLM Applications and Prompt Engineering",
       "proficiency": 95,
-      "proficiency_label": "Project experience"
+      "proficiency_label": "Project experience",
+      "category": "AI & LLMs"
     },
     {
       "name": "Retrieval-Augmented Generation (RAG)",
       "proficiency": 75,
-      "proficiency_label": "Project experience"
+      "proficiency_label": "Project experience",
+      "category": "AI & LLMs"
     },
     {
       "name": "AI Agents and Agent Workflows",
       "proficiency": 75,
-      "proficiency_label": "Project experience"
+      "proficiency_label": "Project experience",
+      "category": "AI & LLMs"
     },
     {
       "name": "FastAPI",
       "proficiency": 85,
-      "proficiency_label": "Project experience"
+      "proficiency_label": "Project experience",
+      "category": "Backend & Tooling"
     },
     {
       "name": "SQL and PostgreSQL",
       "proficiency": 80,
-      "proficiency_label": "Project experience"
+      "proficiency_label": "Project experience",
+      "category": "Languages & Data"
     },
     {
       "name": "MCP and FastMCP",
       "proficiency": 90,
-      "proficiency_label": "Project experience"
+      "proficiency_label": "Project experience",
+      "category": "Backend & Tooling"
     },
     {
       "name": "Git and GitHub",
       "proficiency": 100,
-      "proficiency_label": "Working knowledge"
+      "proficiency_label": "Working knowledge",
+      "category": "Backend & Tooling"
     },
     {
       "name": "Ollama and Local LLMs",
       "proficiency": 95,
-      "proficiency_label": "Project experience"
+      "proficiency_label": "Project experience",
+      "category": "AI & LLMs"
     }
   ],
   "interests": [
