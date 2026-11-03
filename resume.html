@@ -39,9 +39,6 @@
   </head>
   <body>
     <!--resume-->
-    <script>
-      document.getElementById('print').addEventListener('click', function () { window.print() })
-      if (new URLSearchParams(location.search).has('print')) window.addEventListener('load', function () { setTimeout(function () { window.print() }, 300) })
-    </script>
+    <script type="module" src="/src/resume.js"></script>
   </body>
 </html>

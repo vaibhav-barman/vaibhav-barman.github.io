@@ -41,11 +41,32 @@ function portfolioHtml() {
   }
 }
 
+/**
+ * Inlines the (small) site stylesheet into the HTML in production builds,
+ * removing a render-blocking request before first paint.
+ */
+function inlineCss() {
+  return {
+    name: 'inline-css',
+    apply: 'build',
+    transformIndexHtml: {
+      order: 'post',
+      handler(html, ctx) {
+        if (!ctx.bundle) return html
+        return html.replace(/<link rel="stylesheet"[^>]*href="\/(assets\/[^"]+\.css)"[^>]*>/g, (tag, file) => {
+          const asset = ctx.bundle[file]
+          return asset && asset.type === 'asset' ? `<style>${asset.source}</style>` : tag
+        })
+      },
+    },
+  }
+}
+
 // User site (vaibhav-barman.github.io) is served from the domain root, so base is "/".
 // For a project site (username.github.io/repo) set base to "/repo/".
 export default defineConfig({
   base: '/',
-  plugins: [portfolioHtml()],
+  plugins: [portfolioHtml(), inlineCss()],
   build: {
     target: 'es2022',
     chunkSizeWarningLimit: 800,

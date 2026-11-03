@@ -2,7 +2,11 @@
  * The three.js scene behind the page. Loaded lazily by src/main.js only when
  * WebGL works and the visitor hasn't asked for reduced motion.
  *
- *   startScene({ mobile }) -> { setEnabled(on), dispose() }
+ *   await startScene({ mobile }) -> { setEnabled(on), dispose() }
+ *
+ * Start-up is split across several frames, and shaders compile
+ * asynchronously where the browser supports it, so loading the scene never
+ * freezes the page for long.
  */
 import { Color, PerspectiveCamera, Scene, Vector2, Vector3, WebGLRenderer } from 'three'
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
@@ -20,7 +24,10 @@ import { createSkillCluster } from './skills.js'
 import { placeInStage } from './stage.js'
 import { damp } from './util.js'
 
-export function startScene({ mobile = false } = {}) {
+// Let the browser paint/handle input between start-up steps.
+const yieldToBrowser = () => new Promise((resolve) => requestAnimationFrame(() => setTimeout(resolve, 0)))
+
+export async function startScene({ mobile = false } = {}) {
   const cfg = config.scene
   const accent = state.accent ?? theme.accent
 
@@ -55,6 +62,7 @@ export function startScene({ mobile = false } = {}) {
   scene.add(field.group)
   const grid = createGrid({ accent })
   scene.add(grid.mesh)
+  await yieldToBrowser()
 
   // Objects that live inside the page's framed .stage windows.
   const cards = createProjectCards({ projects: portfolio.projects, accent })
@@ -68,6 +76,12 @@ export function startScene({ mobile = false } = {}) {
   ].filter((x) => x.el)
   // Card faces are drawn with the web fonts, so redraw once they're loaded.
   document.fonts?.ready.then(() => cards.setAccent(state.accent ?? theme.accent))
+  await yieldToBrowser()
+  if (renderer.compileAsync) {
+    await renderer.compileAsync(scene, camera)
+    await renderer.compileAsync(overlay, camera)
+  }
+  await yieldToBrowser()
 
   // Bloom on desktop only; phones render straight to the screen.
   let composer = null

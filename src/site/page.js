@@ -25,7 +25,7 @@ export function nav(d) {
     .join('')
   return `<header class="nav" id="nav">
     <div class="nav-inner">
-      <a class="brand" href="#hero" aria-label="${esc(d.name)}, back to top"><span class="brand-mark" aria-hidden="true">&gt;_</span><span>${esc(d.handle)}<span class="accent">.</span>sh</span></a>
+      <a class="brand" href="#hero"><span class="brand-mark" aria-hidden="true">&gt;_</span><span>${esc(d.handle)}<span class="accent">.</span>sh</span><span class="sr-only">, ${esc(d.name)}, back to top</span></a>
       <nav class="nav-links" aria-label="Sections"><ul>${links}</ul></nav>
       <p class="nav-status"><span class="dot" aria-hidden="true"></span><span class="nav-status-label">status:</span> ${esc(d.status)}</p>
       <a class="btn btn-primary nav-cta" href="${esc(config.nav.cta.href)}">${esc(config.nav.cta.label)}</a>
