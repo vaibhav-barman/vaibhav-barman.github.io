@@ -14,12 +14,22 @@ export const config = {
     },
   },
 
-  /** Page sections, in order. `label` is the nav text; eyebrow/title are section headings. */
+  /**
+   * Page sections, in order. `label` is the nav text; eyebrow/title/lead are
+   * the section heading copy. `stage` adds a framed 3D window next to the heading.
+   */
   sections: [
     { id: 'hero', label: 'home', eyebrow: '', title: '' },
     { id: 'about', label: 'about', eyebrow: 'about.md', title: 'Building AI that ships.' },
     { id: 'projects', label: 'projects', eyebrow: '~/projects', title: "Things I've built." },
-    { id: 'skills', label: 'skills', eyebrow: 'skills.txt', title: 'The stack.' },
+    {
+      id: 'skills',
+      label: 'skills',
+      eyebrow: 'skills.txt',
+      title: 'The stack.',
+      lead: 'Grouped by category. Hover a skill to light it up in the graph.',
+      stage: 'fig.02 · skill graph',
+    },
     { id: 'journey', label: 'journey', eyebrow: 'education.md', title: 'The path so far.' },
     { id: 'contact', label: 'contact', eyebrow: 'contact.txt', title: "Let's build something." },
   ],

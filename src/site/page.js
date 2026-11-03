@@ -126,12 +126,49 @@ export function projects(d) {
   </section>`
 }
 
+/** A framed, decorative window the 3D scene draws into (empty without WebGL). */
+function stage(id) {
+  const s = section(id)
+  return `<figure class="stage" data-stage="${id}" aria-hidden="true">
+        <span class="stage-corner tl"></span><span class="stage-corner tr"></span><span class="stage-corner bl"></span><span class="stage-corner br"></span>
+        <figcaption class="stage-caption">${esc(s.stage ?? '')}</figcaption>
+      </figure>`
+}
+
+function sectionIntro(id, eyebrow) {
+  const s = section(id)
+  return `<div class="section-intro${s.stage ? ' has-stage' : ''}">
+      <div class="section-intro-text">
+        ${sectionHead(id, eyebrow)}
+        ${s.lead ? `<p class="section-lead">${esc(s.lead)}</p>` : ''}
+      </div>
+      ${s.stage ? stage(id) : ''}
+    </div>`
+}
+
 export function skills(d) {
+  const chip = (s) =>
+    `<li class="chip" data-skill="${esc(s.slug)}">${esc(s.name)}${s.note ? ` <span class="chip-note">${esc(s.note)}</span>` : ''}</li>`
   return `<section id="skills" class="section" aria-labelledby="skills-title">
     <div class="wrap">
-      ${sectionHead('skills')}
-      ${d.skillGroups.map((g) => `<h3>${esc(g.name)}</h3><ul>${g.skills.map((s) => `<li>${esc(s.name)}</li>`).join('')}</ul>`).join('')}
-      ${d.techTags.length ? `<h3>Also in my projects</h3><p>${esc(d.techTags.join(' · '))}</p>` : ''}
+      ${sectionIntro('skills')}
+      <div class="skill-groups">${d.skillGroups
+        .map(
+          (g, i) => `<article class="skill-group" data-group="${esc(g.slug)}" aria-labelledby="sg-${esc(g.slug)}">
+          <h3 id="sg-${esc(g.slug)}" class="skill-group-title"><span class="skill-group-index" aria-hidden="true">${pad2(i + 1)}</span>${esc(g.name)}</h3>
+          ${g.note ? `<p class="skill-group-note">${esc(g.note)}</p>` : ''}
+          <ul class="chips">${g.skills.map(chip).join('')}</ul>
+        </article>`,
+        )
+        .join('')}</div>
+      ${
+        d.techTags.length
+          ? `<div class="also">
+        <h3 class="label">Also in my projects</h3>
+        <ul class="chips chips-secondary">${d.techTags.map((x) => `<li class="chip">${esc(x)}</li>`).join('')}</ul>
+      </div>`
+          : ''
+      }
     </div>
   </section>`
 }

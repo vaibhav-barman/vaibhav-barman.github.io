@@ -55,3 +55,16 @@ describe('hero', () => {
     expect(hero).toContain(esc(d.tagline))
   })
 })
+
+describe('skills section', () => {
+  const sk = index.slice(index.indexOf('<section id="skills"'), index.indexOf('<section id="journey"'))
+  it('shows every skill as a chip, grouped, with no percentages or ratings', () => {
+    for (const g of d.skillGroups) expect(sk).toContain(esc(g.name))
+    for (const s of d.skills) expect(sk).toContain(`data-skill="${s.slug}">${esc(s.name)}`)
+    expect(sk).not.toMatch(/\d+%|role="meter"|★/)
+  })
+  it('never mentions React, TypeScript, Vite, Tailwind or JavaScript', () => {
+    const projectsHtml = index.slice(index.indexOf('<section id="projects"'), index.indexOf('<section id="skills"'))
+    for (const h of [sk, projectsHtml]) expect(h).not.toMatch(/\b(React|TypeScript|Vite|Tailwind|JavaScript)\b/i)
+  })
+})
