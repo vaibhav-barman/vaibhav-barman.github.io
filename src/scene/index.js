@@ -12,8 +12,12 @@ import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPa
 import { config } from '../config.js'
 import { theme } from '../theme.js'
 import { bus, state } from '../ui/bus.js'
+import { portfolio } from '../data/portfolio.js'
+import { createProjectCards } from './cards.js'
 import { createGrid } from './grid.js'
 import { createNeuralField, mouseState } from './neural.js'
+import { createSkillCluster } from './skills.js'
+import { placeInStage } from './stage.js'
 import { damp } from './util.js'
 
 export function startScene({ mobile = false } = {}) {
@@ -52,6 +56,19 @@ export function startScene({ mobile = false } = {}) {
   const grid = createGrid({ accent })
   scene.add(grid.mesh)
 
+  // Objects that live inside the page's framed .stage windows.
+  const cards = createProjectCards({ projects: portfolio.projects, accent })
+  const skills = createSkillCluster({ groups: portfolio.skillGroups, accent })
+  // Drawn after bloom so card text and labels stay crisp.
+  const overlay = new Scene()
+  overlay.add(cards.group, skills.group)
+  const stages = [
+    { obj: cards, el: document.querySelector('[data-stage="projects"]') },
+    { obj: skills, el: document.querySelector('[data-stage="skills"]') },
+  ].filter((x) => x.el)
+  // Card faces are drawn with the web fonts, so redraw once they're loaded.
+  document.fonts?.ready.then(() => cards.setAccent(state.accent ?? theme.accent))
+
   // Bloom on desktop only; phones render straight to the screen.
   let composer = null
   let bloom = null
@@ -60,6 +77,10 @@ export function startScene({ mobile = false } = {}) {
     composer.addPass(new RenderPass(scene, camera))
     bloom = new UnrealBloomPass(new Vector2(256, 256), cfg.bloom.strength, cfg.bloom.radius, cfg.bloom.threshold)
     composer.addPass(bloom)
+    const overlayPass = new RenderPass(overlay, camera)
+    overlayPass.clear = false
+    overlayPass.clearDepth = true
+    composer.addPass(overlayPass)
     composer.addPass(new OutputPass())
   }
 
@@ -95,30 +116,66 @@ export function startScene({ mobile = false } = {}) {
   addEventListener('pointermove', onPointer, { passive: true })
   document.addEventListener('pointerleave', onLeave)
 
-  const offAccent = bus.on('accent', (c) => {
-    field.setAccent(c)
-    grid.setAccent(c)
-  })
+  const offs = [
+    bus.on('accent', (c) => {
+      field.setAccent(c)
+      grid.setAccent(c)
+      cards.setAccent(c)
+      skills.setAccent(c)
+    }),
+    bus.on('focus-project', (slug) => cards.focus(slug)),
+    bus.on('hover-skill', (slug) => skills.hoverSkill(slug)),
+    bus.on('highlight', (h) => skills.highlightGroup(h?.kind === 'skills' ? (h.group ?? null) : null)),
+  ]
+
+  // Scroll drives a dolly down the corridor: forward along -z and slightly down.
+  let scrollTarget = 0
+  let scrollNow = 0
+  const onScroll = () => {
+    const max = document.documentElement.scrollHeight - innerHeight
+    scrollTarget = max > 0 ? Math.min(1, Math.max(0, scrollY / max)) : 0
+  }
+  onScroll()
+  scrollNow = scrollTarget
+  addEventListener('scroll', onScroll, { passive: true })
 
   let enabled = true
   let raf = 0
   let last = performance.now()
+  let time = 0
   const parallax = new Vector2()
   function frame(now) {
     raf = requestAnimationFrame(frame)
     const dt = Math.min((now - last) / 1000, 0.05)
     last = now
+    time += dt
     mouse.on += (mouse.target - mouse.on) * damp(4, dt)
     parallax.x += (mouse.ndc.x * mouse.on - parallax.x) * damp(2, dt)
     parallax.y += (mouse.ndc.y * mouse.on - parallax.y) * damp(2, dt)
 
+    scrollNow += (scrollTarget - scrollNow) * damp(cfg.cameraEase, dt)
+    const k = scrollNow
+    look.set(Math.sin(k * Math.PI * 2) * cfg.travel.sway, -k * cfg.travel.drop, -k * cfg.travel.depth)
     camera.position.set(look.x + offset.x + parallax.x * cfg.parallax, look.y + offset.y + parallax.y * cfg.parallax * 0.6, look.z + offset.z)
     camera.lookAt(look)
+    camera.updateMatrixWorld()
 
     field.update(dt, { aspect: camera.aspect, mouseOn: mouse.on })
     grid.update(dt)
+    for (const s of stages) {
+      if (!placeInStage(s.obj.group, s.el, camera, { fitHeight: s.obj.fitHeight })) continue
+      const size = s.obj.group.userData.stageSize
+      if (s.obj === cards) cards.update(dt, time, size.w / size.h)
+      else skills.update(dt, time, parallax)
+    }
     if (composer) composer.render(dt)
-    else renderer.render(scene, camera)
+    else {
+      renderer.autoClear = true
+      renderer.render(scene, camera)
+      renderer.autoClear = false
+      renderer.clearDepth()
+      renderer.render(overlay, camera)
+    }
   }
 
   function start() {
@@ -145,13 +202,16 @@ export function startScene({ mobile = false } = {}) {
     },
     dispose() {
       stop()
-      offAccent()
+      offs.forEach((off) => off())
+      removeEventListener('scroll', onScroll)
       removeEventListener('resize', resize)
       removeEventListener('pointermove', onPointer)
       document.removeEventListener('pointerleave', onLeave)
       document.removeEventListener('visibilitychange', onVisibility)
       field.dispose()
       grid.dispose()
+      cards.dispose()
+      skills.dispose()
       composer?.dispose()
       renderer.dispose()
       canvas.remove()

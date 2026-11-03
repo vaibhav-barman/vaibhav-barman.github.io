@@ -108,20 +108,29 @@ export function about(d) {
 }
 
 export function projects(d) {
+  const card = (p) => `<li>
+        <article class="project${p.featured ? ' is-featured' : ''}" data-project="${esc(p.slug)}" aria-labelledby="p-${esc(p.slug)}">
+          <p class="project-meta"><span class="project-index">${pad2(p.index)}</span><span class="project-cat">${esc(p.categoryLabel)}</span>${p.featured ? '<span class="project-star">featured</span>' : ''}</p>
+          <h3 id="p-${esc(p.slug)}" class="project-title">${esc(p.title)}</h3>
+          <p class="project-summary">${esc(p.summary)}</p>
+          ${p.tags.length ? `<ul class="tags" aria-label="Stack">${p.tags.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
+          ${
+            p.highlights.length
+              ? `<details class="project-more"><summary>Highlights</summary><ul>${p.highlights.map((h) => `<li>${esc(h)}</li>`).join('')}</ul></details>`
+              : ''
+          }
+          <p class="project-links">${[
+            p.repoUrl && `<a href="${esc(p.repoUrl)}"${external(p.repoUrl)}>Repository <span aria-hidden="true">↗</span><span class="sr-only"> for ${esc(p.title)} (opens in a new tab)</span></a>`,
+            p.liveUrl && `<a href="${esc(p.liveUrl)}"${external(p.liveUrl)}>Live demo <span aria-hidden="true">↗</span><span class="sr-only"> for ${esc(p.title)} (opens in a new tab)</span></a>`,
+          ]
+            .filter(Boolean)
+            .join('')}</p>
+        </article>
+      </li>`
   return `<section id="projects" class="section" aria-labelledby="projects-title">
     <div class="wrap">
-      ${sectionHead('projects', `~/projects · ${d.projects.length} entries`)}
-      <ol class="projects">${d.projects
-        .map(
-          (p) => `<li><article>
-          <h3>${pad2(p.index)} · ${esc(p.title)} <small>${esc(p.categoryLabel)}</small></h3>
-          <p>${esc(p.summary)}</p>
-          ${p.highlights.length ? `<ul>${p.highlights.map((h) => `<li>${esc(h)}</li>`).join('')}</ul>` : ''}
-          ${p.tags.length ? `<p>${esc(p.tags.join(' · '))}</p>` : ''}
-          ${p.repoUrl ? `<a href="${esc(p.repoUrl)}"${external(p.repoUrl)}>Repository</a>` : ''}
-        </article></li>`,
-        )
-        .join('')}</ol>
+      ${sectionIntro('projects', `~/projects · ${d.projects.length} entries`)}
+      <ol class="projects">${d.projects.map(card).join('')}</ol>
     </div>
   </section>`
 }

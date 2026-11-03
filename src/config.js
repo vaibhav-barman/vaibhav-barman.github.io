@@ -21,7 +21,14 @@ export const config = {
   sections: [
     { id: 'hero', label: 'home', eyebrow: '', title: '' },
     { id: 'about', label: 'about', eyebrow: 'about.md', title: 'Building AI that ships.' },
-    { id: 'projects', label: 'projects', eyebrow: '~/projects', title: "Things I've built." },
+    {
+      id: 'projects',
+      label: 'projects',
+      eyebrow: '~/projects',
+      title: "Things I've built.",
+      lead: 'Agentic and AI-first work first. Hover a project to bring its card forward.',
+      stage: 'fig.01 · featured work',
+    },
     {
       id: 'skills',
       label: 'skills',
@@ -74,20 +81,13 @@ export const config = {
     /** How strongly nodes are pushed away from / lit by the mouse. */
     mouse: { radius: 2.4, push: 0.55 },
     bloom: { strength: 0.9, radius: 0.35, threshold: 0.38 },
-    /** Camera follow speed (higher = snappier). */
+    /** Camera follow speed when scrolling (higher = snappier). */
     cameraEase: 3.2,
     /** Mouse parallax strength (world units). */
     parallax: 0.45,
-    /** World-space point the camera looks at for each section. */
-    anchors: {
-      hero: [0, 0, 0],
-      about: [0, 0.4, -18],
-      projects: [0, 0, -36],
-      skills: [0, 0.3, -56],
-      journey: [0, 0, -74],
-      contact: [0, 0.6, -90],
-    },
-    /** Camera sits this far from the active anchor. */
+    /** Scrolling top→bottom flies the camera this far forward (z), down (y) and side to side. */
+    travel: { depth: 80, drop: 2.5, sway: 1.2 },
+    /** Camera position relative to the point it looks at. */
     cameraOffset: [0, 0.6, 9],
   },
 }

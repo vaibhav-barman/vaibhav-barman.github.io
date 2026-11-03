@@ -14,3 +14,6 @@ initTerminal()
 import { initScene } from './ui/scene-loader.js'
 
 initScene()
+import { initSceneLinks } from './ui/links.js'
+
+initSceneLinks()

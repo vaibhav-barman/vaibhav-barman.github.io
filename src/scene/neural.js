@@ -88,10 +88,12 @@ export function createNeuralField({ count, linksPerNode, linkDistance, accent, m
       varying vec2 vUv;
       varying float vGlow;
       varying float vTwinkle;
+      varying float vFade;
       void main() {
         float glow;
         vec4 mv = displaced(aOffset, aSeed, glow);
         vGlow = glow;
+        vFade = smoothstep(0.8, 4.0, -mv.z) * clamp(1.5 - (-mv.z) / 30.0, 0.0, 1.0);
         vTwinkle = 0.75 + 0.25 * sin(uTime * (0.8 + aSeed) + aSeed * 40.0);
         mv.xy += position.xy * aSize * 4.0 * (1.0 + glow * 0.9);
         vUv = uv;
@@ -103,12 +105,13 @@ export function createNeuralField({ count, linksPerNode, linkDistance, accent, m
       varying vec2 vUv;
       varying float vGlow;
       varying float vTwinkle;
+      varying float vFade;
       void main() {
         float r = length(vUv - 0.5) * 2.0;
         if (r > 1.0) discard;
         float core = smoothstep(0.24, 0.0, r);
         float halo = exp(-r * r * 9.0) * 0.28;
-        float a = (core + halo) * (0.5 + vGlow * 1.3) * vTwinkle * uIntensity;
+        float a = (core + halo) * (0.5 + vGlow * 1.3) * vTwinkle * vFade * uIntensity;
         vec3 col = mix(uColor, vec3(1.0), core * (0.35 + vGlow * 0.5));
         gl_FragColor = vec4(col, a);
         #include <colorspace_fragment>
@@ -175,7 +178,7 @@ export function createNeuralField({ count, linksPerNode, linkDistance, accent, m
         float speed = 0.18 + vLink * 0.25;
         float head = fract(uTime * speed + vLink * 17.0);
         float pulse = smoothstep(0.12, 0.0, abs(vAlong - head)) * step(0.55, fract(vLink * 7.3));
-        float fade = clamp(1.4 - vDepth / 26.0, 0.0, 1.0);
+        float fade = clamp(1.4 - vDepth / 26.0, 0.0, 1.0) * smoothstep(0.8, 4.0, vDepth);
         float a = (0.07 + vGlow * 0.6 + pulse * 0.65) * fade * uIntensity;
         gl_FragColor = vec4(mix(uColor, vec3(1.0), pulse * 0.3), a);
         #include <colorspace_fragment>
