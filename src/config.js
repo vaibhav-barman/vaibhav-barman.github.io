@@ -63,7 +63,7 @@ export const config = {
     maxDpr: { desktop: 1.5, mobile: 1.25 },
     /** How strongly nodes are pushed away from / lit by the mouse. */
     mouse: { radius: 2.4, push: 0.55 },
-    bloom: { strength: 0.75, radius: 0.5, threshold: 0.12 },
+    bloom: { strength: 0.9, radius: 0.35, threshold: 0.38 },
     /** Camera follow speed (higher = snappier). */
     cameraEase: 3.2,
     /** Mouse parallax strength (world units). */

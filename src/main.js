@@ -11,3 +11,6 @@ initNav()
 import { initTerminal } from './ui/terminal.js'
 
 initTerminal()
+import { initScene } from './ui/scene-loader.js'
+
+initScene()

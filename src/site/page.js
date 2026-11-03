@@ -168,6 +168,8 @@ export function footer(d) {
 export function page(d) {
   return html([
     `<a class="skip" href="#main">Skip to content</a>`,
+    // Static background: shown without WebGL / with reduced motion, and under the canvas while it loads.
+    `<div class="bg" aria-hidden="true"></div>`,
     nav(d),
     `<main id="main" tabindex="-1">`,
     hero(d),
