@@ -182,6 +182,11 @@ img {
 }
 .nav-links {
   flex: 1;
+  min-width: 0;
+}
+/* brand on the left; links and the CTA sit together on the right */
+.nav-links ul {
+  justify-content: flex-end;
 }
 .nav-links ul,
 .nav-menu ul {
@@ -209,37 +214,6 @@ img {
 .nav-menu a[aria-current='true'] {
   color: var(--accent);
   background: color-mix(in srgb, var(--accent) 10%, transparent);
-}
-.nav-status {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
-  padding: 6px 12px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  color: var(--text);
-  font: 500 13px var(--font-mono);
-  white-space: nowrap;
-}
-.nav-status-label {
-  color: var(--muted);
-}
-.dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--accent);
-  box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 60%, transparent);
-  animation: pulse 2.2s infinite;
-}
-@keyframes pulse {
-  70% {
-    box-shadow: 0 0 0 8px transparent;
-  }
-  100% {
-    box-shadow: 0 0 0 0 transparent;
-  }
 }
 .nav-menu {
   display: none;
@@ -300,14 +274,8 @@ img {
   padding: 12px 14px;
   font-size: 16px;
 }
-@media (max-width: 1180px) {
-  .nav-status-label {
-    display: none;
-  }
-}
-@media (max-width: 1020px) {
-  .nav-links,
-  .nav-status {
+@media (max-width: 860px) {
+  .nav-links {
     display: none;
   }
   .nav-cta {
@@ -325,6 +293,12 @@ img {
   .nav-cta {
     padding: 10px 14px;
     font-size: 14px;
+  }
+}
+/* very narrow phones: keep just the >_ mark so brand | CTA | menu fit */
+@media (max-width: 360px) {
+  .brand-name {
+    display: none;
   }
 }
 
@@ -382,22 +356,7 @@ main:focus {
 .hero-copy {
   min-width: 0;
 }
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 14px;
-  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--accent) 8%, var(--bg));
-  color: var(--text);
-  font: 500 14px var(--font-mono);
-}
-.badge-key {
-  color: var(--accent);
-}
 .hero-name {
-  margin-top: 28px;
   font-size: clamp(3.2rem, 7vw, 6.4rem);
   font-weight: 700;
   line-height: 0.95;

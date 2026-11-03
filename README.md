@@ -86,7 +86,7 @@ tests/                  ← Vitest tests
 
 Change the JSON, save, and the dev server reloads. Every section, the terminal and the resume update together.
 
-- **Profile:** `name`, `label` (the title under your name), `tagline` (the one-line pitch), `status` (the badge), `contact.location`, `contact.email`, `social_links`.
+- **Profile:** `name`, `label` (the title under your name), `tagline` (the one-line pitch), `status` (shown in the terminal, About, Journey and Contact), `contact.location`, `contact.email`, `social_links`.
 - **Projects:** each entry has `title`, `summary`, `url`, `category` (`agentic`, `rag`, `llm`, `tooling`), `featured` (featured projects come first and get a 3D card), `tags` and `highlights`.
 - **Skills** are grouped. A skill is either a plain string, or `{ "name", "note" }` when it needs a short note:
 

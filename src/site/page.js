@@ -25,9 +25,8 @@ export function nav(d) {
     .join('')
   return `<header class="nav" id="nav">
     <div class="nav-inner">
-      <a class="brand" href="#hero"><span class="brand-mark" aria-hidden="true">&gt;_</span><span>${esc(d.handle)}<span class="accent">.</span>sh</span><span class="sr-only">, ${esc(d.name)}, back to top</span></a>
+      <a class="brand" href="#hero"><span class="brand-mark" aria-hidden="true">&gt;_</span><span class="brand-name">${esc(d.handle)}<span class="accent">.</span>sh</span><span class="sr-only">, ${esc(d.name)}, back to top</span></a>
       <nav class="nav-links" aria-label="Sections"><ul>${links}</ul></nav>
-      <p class="nav-status"><span class="dot" aria-hidden="true"></span><span class="nav-status-label">status:</span> ${esc(d.status)}</p>
       <a class="btn btn-primary nav-cta" href="${esc(config.nav.cta.href)}">${esc(config.nav.cta.label)}</a>
       <details class="nav-menu">
         <summary><span class="sr-only">Open section menu</span><span class="burger" aria-hidden="true"></span></summary>
@@ -76,7 +75,6 @@ export function hero(d) {
   return `<section id="hero" class="hero" aria-labelledby="hero-title">
     <div class="hero-grid">
       <div class="hero-copy">
-        <p class="badge"><span class="dot" aria-hidden="true"></span><span class="badge-key">status:</span> ${esc(d.status)}</p>
         <h1 id="hero-title" class="hero-name">${esc(d.firstName)} <span class="accent glow">${esc(d.lastName)}</span></h1>
         <p class="hero-role"><span class="accent">${esc(primary.trim())}</span>${rest.length ? ` <span class="sep">|</span> ${esc(rest.join('|').trim())}` : ''}</p>
         <p class="hero-pitch">${esc(d.tagline)}</p>

@@ -28,13 +28,15 @@ describe('generated HTML', () => {
 
 describe('nav', () => {
   const navHtml = index.slice(index.indexOf('<header class="nav"'), index.indexOf('</header>'))
-  it('reads brand | links | status | CTA, left to right', () => {
-    const order = ['class="brand"', 'class="nav-links"', 'class="nav-status"', 'nav-cta'].map((k) => navHtml.indexOf(k))
+  it('reads brand | links | CTA, left to right', () => {
+    const order = ['class="brand"', 'class="nav-links"', 'nav-cta'].map((k) => navHtml.indexOf(k))
     expect(order.every((i) => i >= 0)).toBe(true)
     expect([...order].sort((a, b) => a - b)).toEqual(order)
   })
-  it('does not contain the location', () => {
+  it('does not contain the location or a status pill', () => {
     expect(navHtml).not.toContain(d.location)
+    expect(navHtml).not.toContain('nav-status')
+    expect(navHtml).not.toContain(esc(d.status))
   })
 })
 
@@ -44,10 +46,10 @@ describe('hero', () => {
     expect(hero.indexOf('class="hero-copy"')).toBeLessThan(hero.indexOf('class="hero-terminal"'))
     expect(hero).toContain('id="terminal"')
   })
-  it('shows the name, title, status and buttons', () => {
+  it('shows the name, title and buttons, with no status pill', () => {
     expect(hero).toContain(d.firstName)
     expect(hero.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ')).toContain('AI Engineer | LLM Applications, RAG &amp; AI Agents')
-    expect(hero).toContain(esc(d.status))
+    expect(hero).not.toMatch(/class="(badge|dot|nav-status)"/)
     for (const label of ['Projects', 'Resume', 'GitHub', 'LinkedIn']) expect(hero).toContain(`>${label}`)
   })
   it('prerenders whoami in the terminal so it is never empty', () => {
