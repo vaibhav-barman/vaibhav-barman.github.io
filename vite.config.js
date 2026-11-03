@@ -1,10 +1,13 @@
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { defineConfig } from 'vitest/config'
+import { webManifest } from './src/pwa/manifest.js'
 import { faviconSvg } from './src/theme.js'
 
 const root = import.meta.dirname
 const DATA = resolve(root, 'portfolio.json')
+// Deploy path. https://vaibhav-barman.github.io/ is a user site, so it is served from the root.
+const BASE = '/'
 
 /**
  * Renders the page from portfolio.json into index.html and resume.html at
@@ -24,6 +27,10 @@ function portfolioHtml() {
           s.ws.send({ type: 'full-reload' })
         }
       })
+      s.middlewares.use('/site.webmanifest', (_req, res) => {
+        res.setHeader('Content-Type', 'application/manifest+json')
+        res.end(JSON.stringify(webManifest(BASE)))
+      })
       s.middlewares.use('/favicon.svg', async (_req, res) => {
         const { faviconSvg: icon } = await s.ssrLoadModule('/src/theme.js')
         res.setHeader('Content-Type', 'image/svg+xml')
@@ -37,6 +44,7 @@ function portfolioHtml() {
     },
     generateBundle() {
       this.emitFile({ type: 'asset', fileName: 'favicon.svg', source: faviconSvg() })
+      this.emitFile({ type: 'asset', fileName: 'site.webmanifest', source: JSON.stringify(webManifest(BASE), null, 2) })
     },
   }
 }
@@ -62,10 +70,9 @@ function inlineCss() {
   }
 }
 
-// User site (vaibhav-barman.github.io) is served from the domain root, so base is "/".
-// For a project site (username.github.io/repo) set base to "/repo/".
+// For a project site (username.github.io/repo) set BASE to "/repo/".
 export default defineConfig({
-  base: '/',
+  base: BASE,
   plugins: [portfolioHtml(), inlineCss()],
   build: {
     target: 'es2022',

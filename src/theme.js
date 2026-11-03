@@ -55,3 +55,12 @@ export function cssVariables(accent = theme.accent) {
 export function faviconSvg(accent = theme.accent) {
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="${theme.background}"/><path d="M14 20l12 12-12 12" fill="none" stroke="${accent}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M32 44h18" stroke="${theme.text}" stroke-width="5" stroke-linecap="round"/></svg>`
 }
+
+/**
+ * The app icon (PWA / home screen): the favicon's ">_" mark on a full-bleed
+ * background, so the OS can round or mask it. `scale` sizes the mark: 1 keeps
+ * it inside the maskable safe zone (centre 80%), larger fills "any" icons.
+ */
+export function appIconSvg(accent = theme.accent, scale = 1) {
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" fill="${theme.background}"/><g transform="translate(32 32) scale(${scale}) translate(-32 -32)"><path d="M14 20l12 12-12 12" fill="none" stroke="${accent}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M32 44h18" stroke="${theme.text}" stroke-width="5" stroke-linecap="round"/></g></svg>`
+}
