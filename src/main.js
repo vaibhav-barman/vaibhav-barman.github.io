@@ -5,3 +5,6 @@
 import '@fontsource-variable/space-grotesk'
 import '@fontsource-variable/jetbrains-mono'
 import './styles/main.css'
+import { initNav } from './ui/nav.js'
+
+initNav()

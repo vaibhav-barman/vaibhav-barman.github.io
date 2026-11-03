@@ -24,6 +24,9 @@ export const config = {
     { id: 'contact', label: 'contact', eyebrow: 'contact.txt', title: "Let's build something." },
   ],
 
+  /** Call-to-action button on the right of the nav bar. */
+  nav: { cta: { label: 'Get in touch', href: '#contact' } },
+
   terminal: {
     /** Prompt template. {user} defaults to the first name from the JSON. */
     prompt: '{user}@{host}:{cwd}$',

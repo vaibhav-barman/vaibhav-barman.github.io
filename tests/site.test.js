@@ -25,3 +25,15 @@ describe('generated HTML', () => {
     for (const s of d.skills) expect(index).toContain(esc(s.name))
   })
 })
+
+describe('nav', () => {
+  const navHtml = index.slice(index.indexOf('<header class="nav"'), index.indexOf('</header>'))
+  it('reads brand | links | status | CTA, left to right', () => {
+    const order = ['class="brand"', 'class="nav-links"', 'class="nav-status"', 'nav-cta'].map((k) => navHtml.indexOf(k))
+    expect(order.every((i) => i >= 0)).toBe(true)
+    expect([...order].sort((a, b) => a - b)).toEqual(order)
+  })
+  it('does not contain the location', () => {
+    expect(navHtml).not.toContain(d.location)
+  })
+})

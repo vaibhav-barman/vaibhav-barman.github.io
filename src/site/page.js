@@ -17,13 +17,21 @@ function sectionHead(id, eyebrow) {
 const external = (url) => (/^https?:/.test(url) ? ' target="_blank" rel="noopener noreferrer"' : '')
 
 export function nav(d) {
-  return `<header class="nav">
-    <a class="brand" href="#hero">${esc(d.handle)}<span class="accent">.</span>sh</a>
-    <nav aria-label="Sections"><ul class="nav-links">${config.sections
-      .slice(1)
-      .map((s) => `<li><a href="#${s.id}">${esc(s.label)}</a></li>`)
-      .join('')}</ul></nav>
-    <span class="status"><span class="dot" aria-hidden="true"></span>status: ${esc(d.status)}</span>
+  const links = config.sections
+    .slice(1)
+    .map((s) => `<li><a href="#${s.id}" data-nav="${s.id}">${esc(s.label)}</a></li>`)
+    .join('')
+  return `<header class="nav" id="nav">
+    <div class="nav-inner">
+      <a class="brand" href="#hero" aria-label="${esc(d.name)}, back to top"><span class="brand-mark" aria-hidden="true">&gt;_</span><span>${esc(d.handle)}<span class="accent">.</span>sh</span></a>
+      <nav class="nav-links" aria-label="Sections"><ul>${links}</ul></nav>
+      <p class="nav-status"><span class="dot" aria-hidden="true"></span><span class="nav-status-label">status:</span> ${esc(d.status)}</p>
+      <a class="btn btn-primary nav-cta" href="${esc(config.nav.cta.href)}">${esc(config.nav.cta.label)}</a>
+      <details class="nav-menu">
+        <summary><span class="sr-only">Open section menu</span><span class="burger" aria-hidden="true"></span></summary>
+        <nav aria-label="Sections (menu)"><ul>${links}</ul></nav>
+      </details>
+    </div>
   </header>`
 }
 
