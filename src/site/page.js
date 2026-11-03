@@ -99,10 +99,23 @@ export function about(d) {
   ].filter(Boolean)
   return `<section id="about" class="section" aria-labelledby="about-title">
     <div class="wrap">
-      ${sectionHead('about')}
-      <p>${esc(d.summary)}</p>
-      <dl class="facts">${facts.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>
-      ${d.interests.length ? `<h3>Off-screen</h3><ul>${d.interests.map((i) => `<li><strong>${esc(i.name)}</strong>${i.summary ? `: ${esc(i.summary)}` : ''}</li>`).join('')}</ul>` : ''}
+      ${sectionIntro('about')}
+      <div class="about-grid">
+        <div class="about-main panel">
+          ${d.image ? `<img class="portrait" src="/${esc(d.image)}" alt="Portrait of ${esc(d.name)}" width="96" height="96" loading="lazy" decoding="async">` : ''}
+          <p class="about-summary">${esc(d.summary)}</p>
+          <dl class="facts">${facts.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>
+        </div>
+        ${
+          d.interests.length
+            ? `<div class="about-side">
+          <h3 class="label">Off-screen</h3>
+          <ul class="interests">${d.interests.map((i) => `<li><strong>${esc(i.name)}</strong>${i.summary ? `<span>${esc(i.summary)}</span>` : ''}</li>`).join('')}</ul>
+          ${d.achievements.length ? `<ul class="medals" aria-label="Race medals">${d.achievements.map((a) => `<li><span aria-hidden="true">◆</span> ${esc(a.title)}</li>`).join('')}</ul>` : ''}
+        </div>`
+            : ''
+        }
+      </div>
     </div>
   </section>`
 }
@@ -185,13 +198,24 @@ export function skills(d) {
 export function journey(d) {
   return `<section id="journey" class="section" aria-labelledby="journey-title">
     <div class="wrap">
-      ${sectionHead('journey')}
-      <ol>${d.timeline
+      ${sectionIntro('journey')}
+      <ol class="timeline">${d.timeline
         .map(
-          (x) =>
-            `<li><strong>${esc(x.title)}</strong>, ${x.url ? `<a href="${esc(x.url)}"${external(x.url)}>${esc(x.org)}</a>` : esc(x.org)}${x.when ? ` (${esc(x.when)})` : ''}${x.details.length ? `<br>${esc(x.details.join(' · '))}` : ''}</li>`,
+          (x) => `<li class="timeline-item">
+          <p class="timeline-when">${esc(x.when || x.kind)}</p>
+          <h3 class="timeline-title">${esc(x.title)}</h3>
+          <p class="timeline-org">${x.url ? `<a href="${esc(x.url)}"${external(x.url)}>${esc(x.org)}</a>` : esc(x.org)}${x.location ? ` · ${esc(x.location)}` : ''}</p>
+          ${x.summary ? `<p>${esc(x.summary)}</p>` : ''}
+          ${x.details.length ? `<ul class="tags">${x.details.map((y) => `<li>${esc(y)}</li>`).join('')}</ul>` : ''}
+        </li>`,
         )
-        .join('')}</ol>
+        .join('')}
+        ${
+          d.timeline.some((x) => x.kind !== 'education')
+            ? ''
+            : `<li class="timeline-item is-next"><p class="timeline-when">next</p><h3 class="timeline-title">${esc(section('journey').next)}</h3><p class="timeline-org">${esc(d.status)}</p></li>`
+        }
+      </ol>
     </div>
   </section>`
 }
@@ -199,16 +223,33 @@ export function journey(d) {
 export function contact(d) {
   return `<section id="contact" class="section" aria-labelledby="contact-title">
     <div class="wrap">
-      ${sectionHead('contact')}
-      ${d.email ? `<p><a href="mailto:${esc(d.email)}">${esc(d.email)}</a></p>` : ''}
-      <ul>${d.socials.map((s) => `<li><a href="${esc(s.url)}" rel="me noopener noreferrer" target="_blank">${esc(s.label)}</a></li>`).join('')}
-        <li><a href="/resume.html">Resume</a></li></ul>
+      ${sectionIntro('contact')}
+      <div class="contact panel">
+        <p class="contact-lead">Currently <span class="accent">${esc(d.status)}</span>. The fastest way to reach me:</p>
+        ${d.email ? `<a class="contact-email" href="mailto:${esc(d.email)}">${esc(d.email)}</a>` : ''}
+        <ul class="contact-links">${d.socials
+          .filter((s) => s.key !== 'website')
+          .map((s) => `<li><a class="btn" href="${esc(s.url)}" rel="me noopener noreferrer" target="_blank">${esc(s.label)} <span aria-hidden="true">↗</span><span class="sr-only"> (opens in a new tab)</span></a></li>`)
+          .join('')}
+          <li><a class="btn" href="/resume.html">Resume</a></li>
+        </ul>
+      </div>
     </div>
   </section>`
 }
 
 export function footer(d) {
-  return `<footer class="footer"><p>© ${new Date().getFullYear()} ${esc(d.name)} · built from portfolio.json</p></footer>`
+  return `<footer class="footer">
+    <div class="footer-inner">
+      <p>© ${new Date().getFullYear()} ${esc(d.name)}${d.location ? ` · ${esc(d.location)}` : ''}</p>
+      <p class="footer-meta">
+        <span>generated from <code>portfolio.json</code></span>
+        <span class="footer-key">terminal <kbd>${esc(config.terminal.focusKey)}</kbd></span>
+        <button type="button" class="link-btn" id="toggle-3d" hidden>3D: on</button>
+        <a href="#hero">back to top ↑</a>
+      </p>
+    </div>
+  </footer>`
 }
 
 export function page(d) {

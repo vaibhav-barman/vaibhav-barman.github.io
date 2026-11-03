@@ -37,7 +37,14 @@ export const config = {
       lead: 'Grouped by category. Hover a skill to light it up in the graph.',
       stage: 'fig.02 · skill graph',
     },
-    { id: 'journey', label: 'journey', eyebrow: 'education.md', title: 'The path so far.' },
+    {
+      id: 'journey',
+      label: 'journey',
+      eyebrow: 'experience.md · education.md',
+      title: 'The path so far.',
+      /** Shown as the last timeline step while work_experience is empty. */
+      next: 'Your team?',
+    },
     { id: 'contact', label: 'contact', eyebrow: 'contact.txt', title: "Let's build something." },
   ],
 
