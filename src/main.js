@@ -17,3 +17,6 @@ initScene()
 import { initSceneLinks } from './ui/links.js'
 
 initSceneLinks()
+import { registerServiceWorker } from './pwa/register.js'
+
+registerServiceWorker()
