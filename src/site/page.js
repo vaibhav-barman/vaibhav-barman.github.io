@@ -4,6 +4,8 @@
  * words in portfolio.json. JavaScript only adds the terminal and 3D scene.
  */
 import { config } from '../config.js'
+import { whoami } from '../cli/commands/info.js'
+import { inputLineHtml, linesHtml, promptText } from '../cli/render.js'
 import { esc, html, pad2 } from './util.js'
 
 const section = (id) => config.sections.find((s) => s.id === id)
@@ -35,11 +37,55 @@ export function nav(d) {
   </header>`
 }
 
+function terminalWindow(d) {
+  // Prerendered so the window is never empty, even without JavaScript.
+  // src/ui/terminal.js replaces it with the live, interactive shell.
+  const noop = () => {}
+  const out = whoami.run([], { data: d, actions: { goTo: noop } })
+  const title = promptText('~', d.handle).replace(/\$$/, '')
+  return `<div class="term" id="terminal" role="region" aria-label="Interactive terminal">
+        <div class="term-bar">
+          <span class="term-lights" aria-hidden="true"><span></span><span></span><span></span></span>
+          <span class="term-title" id="term-title">${esc(title)}</span>
+          <kbd class="term-key" title="Press ${esc(config.terminal.focusKey)} to focus the terminal">${esc(config.terminal.focusKey)}</kbd>
+        </div>
+        <div class="term-body" id="term-body">
+          <div class="term-static">
+            ${inputLineHtml('~', d.handle, config.terminal.autoRun)}
+            ${linesHtml(out)}
+            <noscript><div class="ln"><span class="t-muted">Turn on JavaScript to use this terminal. Everything it shows is also on this page.</span></div></noscript>
+          </div>
+        </div>
+        <div class="term-chips" aria-label="Quick commands">${config.terminal.chips
+          .map((c) => `<button type="button" class="chip-cmd" data-cmd="${esc(c)}">${esc(c)}</button>`)
+          .join('')}</div>
+      </div>`
+}
+
 export function hero(d) {
+  const [primary, ...rest] = d.role.split('|')
+  const buttons = [
+    { label: 'Projects', href: '#projects', primary: true },
+    { label: 'Resume', href: '/resume.html' },
+    d.github && { label: 'GitHub', href: d.github.url },
+    d.linkedin && { label: 'LinkedIn', href: d.linkedin.url },
+  ].filter(Boolean)
   return `<section id="hero" class="hero" aria-labelledby="hero-title">
-    <h1 id="hero-title">${esc(d.name)}</h1>
-    <p class="role">${esc(d.role)}</p>
-    <p class="pitch">${esc(d.tagline)}</p>
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <p class="badge"><span class="dot" aria-hidden="true"></span><span class="badge-key">status:</span> ${esc(d.status)}</p>
+        <h1 id="hero-title" class="hero-name">${esc(d.firstName)} <span class="accent glow">${esc(d.lastName)}</span></h1>
+        <p class="hero-role"><span class="accent">${esc(primary.trim())}</span>${rest.length ? ` <span class="sep">|</span> ${esc(rest.join('|').trim())}` : ''}</p>
+        <p class="hero-pitch">${esc(d.tagline)}</p>
+        <div class="hero-actions">${buttons
+          .map((b) => `<a class="btn${b.primary ? ' btn-primary' : ''}" href="${esc(b.href)}"${external(b.href)}>${esc(b.label)}${/^https?:/.test(b.href) ? ' <span aria-hidden="true">↗</span>' : ''}</a>`)
+          .join('')}</div>
+        ${d.location ? `<p class="hero-meta"><span class="t-muted">based in</span> ${esc(d.location)}</p>` : ''}
+      </div>
+      <div class="hero-terminal">
+      ${terminalWindow(d)}
+      </div>
+    </div>
   </section>`
 }
 

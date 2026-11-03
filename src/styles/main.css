@@ -11,6 +11,9 @@
 *::after {
   box-sizing: border-box;
 }
+:root {
+  --maxw: 1312px;
+}
 html {
   background: var(--bg);
   scroll-behavior: smooth;
@@ -150,7 +153,7 @@ img {
   display: flex;
   align-items: center;
   gap: 24px;
-  max-width: 1360px;
+  max-width: calc(var(--maxw) + 48px);
   height: 68px;
   margin: 0 auto;
   padding: 0 24px;
@@ -338,7 +341,7 @@ main:focus {
   padding: 120px 24px;
 }
 .wrap {
-  max-width: 1240px;
+  max-width: var(--maxw);
   margin: 0 auto;
 }
 .eyebrow {
@@ -355,5 +358,269 @@ main:focus {
 @media (max-width: 640px) {
   .section {
     padding: 88px 16px;
+  }
+}
+
+/* ---------- hero: text left, terminal right ---------- */
+.hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 100vh;
+  min-height: 100svh;
+  padding: 108px 24px 64px;
+}
+.hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(32px, 4vw, 64px);
+  width: 100%;
+  max-width: var(--maxw);
+  margin: 0 auto;
+}
+.hero-copy {
+  min-width: 0;
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 8%, var(--bg));
+  color: var(--text);
+  font: 500 14px var(--font-mono);
+}
+.badge-key {
+  color: var(--accent);
+}
+.hero-name {
+  margin-top: 28px;
+  font-size: clamp(3.2rem, 7vw, 6.4rem);
+  font-weight: 700;
+  line-height: 0.95;
+  letter-spacing: -0.035em;
+}
+.glow {
+  text-shadow: 0 0 32px color-mix(in srgb, var(--accent) 45%, transparent);
+}
+.hero-role {
+  margin-top: 24px;
+  color: var(--text);
+  font: 500 clamp(1.05rem, 1.6vw, 1.3rem) / 1.45 var(--font-mono);
+}
+.hero-role .sep {
+  color: var(--muted);
+}
+.hero-pitch {
+  max-width: 34em;
+  margin-top: 18px;
+  color: var(--text);
+  font-size: clamp(1.1rem, 1.5vw, 1.3rem);
+  line-height: 1.55;
+}
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 36px;
+}
+.hero-meta {
+  margin-top: 28px;
+  color: var(--text);
+  font: 500 14px var(--font-mono);
+}
+.hero-terminal {
+  min-width: 0;
+}
+
+/* ---------- terminal window (glass) ---------- */
+.term {
+  display: flex;
+  flex-direction: column;
+  height: clamp(440px, 64vh, 620px);
+  overflow: hidden;
+  isolation: isolate;
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--line));
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--bg) 72%, transparent);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 40px 100px -40px color-mix(in srgb, var(--accent) 45%, transparent);
+  transition:
+    border-color 0.25s,
+    box-shadow 0.25s;
+}
+.term:focus-within {
+  border-color: var(--accent);
+  box-shadow:
+    0 0 0 1px var(--accent),
+    0 40px 100px -40px color-mix(in srgb, var(--accent) 60%, transparent);
+}
+.term-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--line);
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+}
+.term-lights {
+  display: flex;
+  gap: 7px;
+}
+.term-lights span {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--text) 14%, transparent);
+}
+.term-lights span:first-child {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.term-title {
+  flex: 1;
+  overflow: hidden;
+  color: var(--muted);
+  font: 500 13px var(--font-mono);
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.term-key,
+kbd {
+  padding: 2px 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--text) 6%, transparent);
+  color: var(--text);
+  font: 500 12px var(--font-mono);
+}
+.term-body {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 16px 18px;
+  color: var(--text);
+  font: 400 14px/1.6 var(--font-mono);
+  overflow-wrap: anywhere;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--accent) 40%, transparent) transparent;
+  cursor: text;
+}
+.ln {
+  min-height: 1.6em;
+  white-space: pre-wrap;
+}
+.t-accent,
+.t-heading {
+  color: var(--accent);
+}
+.t-heading {
+  font-weight: 600;
+}
+.t-muted {
+  color: var(--muted);
+}
+.t-dim {
+  color: var(--muted);
+  opacity: 0.85;
+}
+.t-bold {
+  color: #fff;
+  font-weight: 700;
+}
+.t-ok {
+  color: var(--accent);
+}
+.t-error {
+  color: var(--error);
+}
+.t-path,
+.t-input {
+  color: var(--text);
+}
+.term-body a,
+.t-cmd {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--accent) 45%, transparent);
+  text-underline-offset: 3px;
+}
+.t-cmd {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  text-decoration-style: dotted;
+  cursor: pointer;
+}
+.t-cmd:hover,
+.term-body a:hover {
+  text-decoration-style: solid;
+  text-decoration-color: var(--accent);
+}
+.term-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--line);
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+}
+html:not(.js) .term-chips {
+  display: none;
+}
+.chip-cmd {
+  min-height: 40px;
+  padding: 8px 14px;
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--line));
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--accent) 6%, transparent);
+  color: var(--text);
+  font: 500 14px var(--font-mono);
+  cursor: pointer;
+}
+.chip-cmd::before {
+  content: '$ ';
+  color: var(--accent);
+}
+.chip-cmd:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* phones and narrow tablets: text first, terminal below */
+@media (max-width: 960px) {
+  .hero {
+    min-height: 0;
+    padding: 100px 16px 48px;
+  }
+  .hero-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 40px;
+  }
+  .term {
+    height: 400px;
+  }
+  .term-body {
+    font-size: 13px;
+    padding: 14px;
+  }
+  .term-key {
+    display: none;
+  }
+}
+@media (max-width: 420px) {
+  .hero-actions .btn {
+    flex: 1 1 calc(50% - 12px);
   }
 }

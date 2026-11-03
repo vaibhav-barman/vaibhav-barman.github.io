@@ -37,3 +37,21 @@ describe('nav', () => {
     expect(navHtml).not.toContain(d.location)
   })
 })
+
+describe('hero', () => {
+  const hero = index.slice(index.indexOf('<section id="hero"'), index.indexOf('<section id="about"'))
+  it('puts the text first and the terminal second (right half on desktop)', () => {
+    expect(hero.indexOf('class="hero-copy"')).toBeLessThan(hero.indexOf('class="hero-terminal"'))
+    expect(hero).toContain('id="terminal"')
+  })
+  it('shows the name, title, status and buttons', () => {
+    expect(hero).toContain(d.firstName)
+    expect(hero.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ')).toContain('AI Engineer | LLM Applications, RAG &amp; AI Agents')
+    expect(hero).toContain(esc(d.status))
+    for (const label of ['Projects', 'Resume', 'GitHub', 'LinkedIn']) expect(hero).toContain(`>${label}`)
+  })
+  it('prerenders whoami in the terminal so it is never empty', () => {
+    expect(hero).toContain('vaibhav@portfolio')
+    expect(hero).toContain(esc(d.tagline))
+  })
+})
