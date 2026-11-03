@@ -2,8 +2,8 @@
   "name": "Vaibhav Barman · Portfolio",
   "short_name": "Portfolio",
   "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }],
-  "theme_color": "#05060a",
-  "background_color": "#05060a",
+  "theme_color": "#05070a",
+  "background_color": "#05070a",
   "display": "standalone",
   "start_url": "/"
 }

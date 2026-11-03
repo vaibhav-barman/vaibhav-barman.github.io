@@ -1,0 +1,61 @@
+/* Colours and fonts come from src/theme.js (injected as CSS variables). */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html {
+  background: var(--bg);
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 17px/1.6 var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+a {
+  color: var(--accent);
+}
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+.skip {
+  position: absolute;
+  left: 8px;
+  top: -60px;
+}
+.skip:focus {
+  top: 8px;
+}
+.nav {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  padding: 16px 24px;
+}
+.nav-links {
+  display: flex;
+  gap: 16px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.section,
+.hero {
+  padding: 64px 24px;
+}
+.wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.eyebrow {
+  font-family: var(--font-mono);
+  color: var(--accent);
+}
+.accent {
+  color: var(--accent);
+}
