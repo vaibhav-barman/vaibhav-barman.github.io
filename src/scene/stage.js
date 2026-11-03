@@ -11,7 +11,7 @@ const tmp = new Vector3()
  * position, and scales it so `fitHeight` world units fill the element.
  * Returns false (and hides the object) when the element is off screen.
  */
-export function placeInStage(obj, el, camera, { distance = 8, fitHeight = 1 } = {}) {
+export function placeInStage(obj, el, camera, { distance = 8, fitHeight = 1, fitWidth = Infinity } = {}) {
   const r = el.getBoundingClientRect()
   const vh = innerHeight
   const vw = innerWidth
@@ -28,6 +28,6 @@ export function placeInStage(obj, el, camera, { distance = 8, fitHeight = 1 } = 
   const worldH = (r.height / vh) * 2 * halfH
   const worldW = (r.width / vw) * 2 * halfW
   obj.userData.stageSize = { w: worldW, h: worldH }
-  obj.scale.setScalar(worldH / fitHeight)
+  obj.scale.setScalar(Math.min(worldH / fitHeight, worldW / fitWidth))
   return true
 }

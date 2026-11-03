@@ -41,7 +41,10 @@ function terminalWindow(d) {
   // Prerendered so the window is never empty, even without JavaScript.
   // src/ui/terminal.js replaces it with the live, interactive shell.
   const noop = () => {}
-  const out = whoami.run([], { data: d, actions: { goTo: noop } })
+  // Without JS the command links can't run, so show them as plain accent text.
+  const out = whoami
+    .run([], { data: d, actions: { goTo: noop } })
+    .map((line) => line.map((sp) => (typeof sp === 'object' && sp.cmd ? { text: sp.text, tone: 'accent' } : sp)))
   const title = promptText('~', d.handle).replace(/\$$/, '')
   return `<div class="term" id="terminal" role="region" aria-label="Interactive terminal">
         <div class="term-bar">

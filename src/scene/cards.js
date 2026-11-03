@@ -94,6 +94,7 @@ export function createProjectCards({ projects, accent, max = 5 }) {
   return {
     group,
     fitHeight: 2.8,
+    fitWidth: 3.9,
     setAccent(c) {
       color.set(c)
       cards.forEach((card) => {

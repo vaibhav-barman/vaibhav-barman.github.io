@@ -168,6 +168,7 @@ export function createSkillCluster({ groups, accent }) {
   return {
     group,
     fitHeight: 3.1,
+    fitWidth: 5.6,
     setAccent: (c) => color.set(c),
     hoverSkill(slug) {
       hoverSkill = slug

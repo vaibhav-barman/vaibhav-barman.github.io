@@ -1242,3 +1242,19 @@ html:not(.js) .term-chips {
     display: none;
   }
 }
+
+/* ---------- static fallback for the 3D stages ---------- */
+.stage::before {
+  content: '';
+  position: absolute;
+  inset: 22px;
+  background-image: radial-gradient(color-mix(in srgb, var(--accent) 35%, transparent) 1px, transparent 1.5px);
+  background-size: 22px 22px;
+  mask-image: radial-gradient(closest-side, #000, transparent);
+  -webkit-mask-image: radial-gradient(closest-side, #000, transparent);
+  opacity: 0.6;
+  transition: opacity 0.8s;
+}
+.has-3d .stage::before {
+  opacity: 0;
+}

@@ -143,12 +143,36 @@ export function startScene({ mobile = false } = {}) {
   let raf = 0
   let last = performance.now()
   let time = 0
+  // Adaptive quality: if frames are slow for a couple of seconds, drop
+  // bloom first, then the pixel ratio, to stay close to 60fps.
+  let slowFrames = 0
+  let sampled = 0
+  let quality = 2
+  function adapt(dt) {
+    sampled++
+    if (dt > 1 / 45) slowFrames++
+    if (sampled < 120) return
+    if (slowFrames > 60 && quality > 0) {
+      quality--
+      if (quality === 1 && composer) {
+        composer.dispose()
+        composer = null
+      } else if (quality === 0) {
+        renderer.setPixelRatio(1)
+        width = 0
+        resize()
+      }
+    }
+    sampled = 0
+    slowFrames = 0
+  }
   const parallax = new Vector2()
   function frame(now) {
     raf = requestAnimationFrame(frame)
     const dt = Math.min((now - last) / 1000, 0.05)
     last = now
     time += dt
+    adapt(dt)
     mouse.on += (mouse.target - mouse.on) * damp(4, dt)
     parallax.x += (mouse.ndc.x * mouse.on - parallax.x) * damp(2, dt)
     parallax.y += (mouse.ndc.y * mouse.on - parallax.y) * damp(2, dt)
@@ -163,7 +187,7 @@ export function startScene({ mobile = false } = {}) {
     field.update(dt, { aspect: camera.aspect, mouseOn: mouse.on })
     grid.update(dt)
     for (const s of stages) {
-      if (!placeInStage(s.obj.group, s.el, camera, { fitHeight: s.obj.fitHeight })) continue
+      if (!placeInStage(s.obj.group, s.el, camera, { fitHeight: s.obj.fitHeight, fitWidth: s.obj.fitWidth })) continue
       const size = s.obj.group.userData.stageSize
       if (s.obj === cards) cards.update(dt, time, size.w / size.h)
       else skills.update(dt, time, parallax)
@@ -199,6 +223,9 @@ export function startScene({ mobile = false } = {}) {
       canvas.classList.toggle('ready', on)
       if (on) start()
       else stop()
+    },
+    get quality() {
+      return quality
     },
     dispose() {
       stop()
