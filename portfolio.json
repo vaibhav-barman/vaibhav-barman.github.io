@@ -76,20 +76,18 @@
     },
     {
       "title": "PromptRoute",
-      "summary": "An LLM-native travel itinerary planner that generates structured, time-slotted travel plans using a local Ollama model and an interactive React interface.",
+      "summary": "An LLM-native travel itinerary planner that generates structured, time-slotted travel plans using a local Ollama model and an interactive web interface.",
       "url": "https://github.com/vaibhav-barman/promptroute",
       "featured": false,
       "category": "llm",
       "tags": [
         "Ollama",
-        "React",
-        "Vite",
-        "Tailwind CSS",
+        "Local LLMs",
         "Structured output"
       ],
       "highlights": [
         "Explores a Backend-as-a-Prompt architecture that returns structured JSON without a conventional application server or database.",
-        "Connects local model output to an interactive frontend built with React, Vite, and Tailwind CSS.",
+        "Connects local model output to an interactive web frontend.",
         "Designed for local inference without cloud API keys or per-token inference costs."
       ],
       "images": []
@@ -103,14 +101,13 @@
       "tags": [
         "AI Agents",
         "FastAPI",
-        "React",
         "SQLite",
         "Groq"
       ],
       "highlights": [
         "Uses LLM reasoning to classify payment-failure context and choose a recovery action.",
         "Records simulated outcomes and feeds strategy-performance history into subsequent decisions.",
-        "Combines a React frontend with a FastAPI backend, SQLite, and a Groq-hosted LLM."
+        "Combines a web dashboard with a FastAPI backend, SQLite, and a Groq-hosted LLM."
       ],
       "images": [
         {
@@ -186,13 +183,13 @@
       "tags": [
         "Gemini",
         "FastAPI",
-        "React",
-        "TypeScript",
-        "PostgreSQL"
+        "PostgreSQL",
+        "SQLAlchemy",
+        "Alembic"
       ],
       "highlights": [
         "Integrates Gemini-based resume and job-description analysis into a full-stack application.",
-        "Uses a React, TypeScript, Vite, and Tailwind CSS frontend with a Python FastAPI backend.",
+        "Pairs a web frontend with a Python FastAPI backend.",
         "Includes PostgreSQL persistence with SQLAlchemy and Alembic, input validation, prompt-injection defenses, and automated tests."
       ],
       "images": []
@@ -233,59 +230,100 @@
   ],
   "skills": [
     {
-      "name": "Python",
-      "proficiency": 90,
-      "proficiency_label": "Project experience",
-      "category": "Languages & Data"
+      "category": "Languages & Databases",
+      "items": [
+        "Python",
+        "SQL",
+        "MySQL",
+        "PostgreSQL",
+        "SQLite"
+      ]
     },
     {
-      "name": "LLM Applications and Prompt Engineering",
-      "proficiency": 95,
-      "proficiency_label": "Project experience",
-      "category": "AI & LLMs"
+      "category": "LLM & Agent Frameworks",
+      "items": [
+        "LangChain",
+        "LangGraph",
+        "MCP",
+        "FastMCP",
+        "RAG",
+        "Local LLMs",
+        "Ollama"
+      ]
     },
     {
-      "name": "Retrieval-Augmented Generation (RAG)",
-      "proficiency": 75,
-      "proficiency_label": "Project experience",
-      "category": "AI & LLMs"
+      "category": "Agentic Coding",
+      "items": [
+        "Claude Code"
+      ]
     },
     {
-      "name": "AI Agents and Agent Workflows",
-      "proficiency": 75,
-      "proficiency_label": "Project experience",
-      "category": "AI & LLMs"
+      "category": "Model APIs",
+      "note": "worked with API keys for",
+      "items": [
+        "Anthropic",
+        "OpenAI",
+        "Gemini",
+        "Groq",
+        "NVIDIA"
+      ]
     },
     {
-      "name": "FastAPI",
-      "proficiency": 85,
-      "proficiency_label": "Project experience",
-      "category": "Backend & Tooling"
+      "category": "Vector DB & Cache",
+      "items": [
+        "ChromaDB",
+        "Redis"
+      ]
     },
     {
-      "name": "SQL and PostgreSQL",
-      "proficiency": 80,
-      "proficiency_label": "Project experience",
-      "category": "Languages & Data"
+      "category": "Backend",
+      "items": [
+        "FastAPI",
+        "Pydantic",
+        "SQLAlchemy",
+        {
+          "name": "Alembic",
+          "note": "migrations"
+        },
+        "Async",
+        "Authentication",
+        "Authorization",
+        "Pagination",
+        {
+          "name": "Rate limiting",
+          "note": "SlowAPI"
+        }
+      ]
     },
     {
-      "name": "MCP and FastMCP",
-      "proficiency": 90,
-      "proficiency_label": "Project experience",
-      "category": "Backend & Tooling"
+      "category": "Cloud & DevOps",
+      "items": [
+        "AWS S3",
+        "EC2",
+        "Lambda",
+        {
+          "name": "Boto3",
+          "note": "Amazon's Python SDK"
+        },
+        "Docker",
+        "Nginx",
+        {
+          "name": "Ubuntu",
+          "note": "Linux"
+        }
+      ]
     },
     {
-      "name": "Git and GitHub",
-      "proficiency": 100,
-      "proficiency_label": "Working knowledge",
-      "category": "Backend & Tooling"
-    },
-    {
-      "name": "Ollama and Local LLMs",
-      "proficiency": 95,
-      "proficiency_label": "Project experience",
-      "category": "AI & LLMs"
+      "category": "Tools",
+      "items": [
+        "Git",
+        "GitHub"
+      ]
     }
+  ],
+  "also_used_exclude": [
+    "BeautifulSoup",
+    "Structured output"
   ],
   "interests": [
     {

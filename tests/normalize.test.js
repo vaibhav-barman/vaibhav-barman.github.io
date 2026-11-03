@@ -42,3 +42,35 @@ describe('normalize', () => {
     expect(d.skillGroups.flatMap((g) => g.skills)).toHaveLength(d.skills.length)
   })
 })
+
+describe('portfolio.json content rules', () => {
+  const d = normalize(raw)
+  const BANNED = /\b(react|typescript|vite|tailwind(\s*css)?|javascript)\b/i
+
+  it('never lists React, TypeScript, Vite, Tailwind CSS or JavaScript as skills or tags', () => {
+    for (const s of d.skills) expect(s.name).not.toMatch(BANNED)
+    for (const p of d.projects) for (const tag of p.tags) expect(tag, p.title).not.toMatch(BANNED)
+    for (const p of d.projects) for (const h of [p.summary, ...p.highlights]) expect(h, p.title).not.toMatch(BANNED)
+    for (const tag of d.techTags) expect(tag).not.toMatch(BANNED)
+  })
+
+  it('keeps BeautifulSoup and "Structured output" out of the "also used" chips', () => {
+    expect(d.techTags).not.toContain('BeautifulSoup')
+    expect(d.techTags).not.toContain('Structured output')
+  })
+
+  it('has the expected skill groups, without proficiency numbers', () => {
+    expect(d.skillGroups.map((g) => g.name)).toEqual([
+      'Languages & Databases',
+      'LLM & Agent Frameworks',
+      'Agentic Coding',
+      'Model APIs',
+      'Vector DB & Cache',
+      'Backend',
+      'Cloud & DevOps',
+      'Tools',
+    ])
+    expect(d.skills).toHaveLength(38)
+    expect(JSON.stringify(raw.skills)).not.toMatch(/proficiency/)
+  })
+})
