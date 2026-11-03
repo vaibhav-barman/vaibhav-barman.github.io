@@ -36,6 +36,21 @@ A dark, cinematic portfolio for an AI engineer: a three.js neural-network scene,
   - The pixel ratio is capped, and quality drops automatically if the frame rate falls.
   - Lighthouse on a local production build: 100 for Performance, Accessibility, Best Practices and SEO, on mobile and desktop.
 
+## Install as an app
+
+The site is a Progressive Web App: you can add it to your home screen or desktop and it opens in its own window, even offline.
+
+- **Android (Chrome):** open the site, tap the **⋮** menu, then **Install app** (on some versions: **Add to Home screen → Install**).
+- **iPhone / iPad (Safari):** open the site, tap **Share**, then **Add to Home Screen**, then **Add**. It must be Safari; other iOS browsers can't install it.
+- **Desktop (Chrome or Edge):** click the install icon at the right end of the address bar, or the browser menu, then **Install**.
+
+How it works:
+
+- The [web app manifest](src/pwa/manifest.js) is generated at build time, so its colours come from [`src/theme.js`](src/theme.js) (`theme_color` is the accent, `background_color` the dark background).
+- The service worker ([`src/pwa/sw.js`](src/pwa/sw.js)) is written to `dist/sw.js` at build time with a version hash of every built file. Pages are fetched from the network first and fall back to the cache offline, so a new deploy shows up on the next visit and old caches are deleted. It is registered in production builds only, so `npm run dev` never serves cached files.
+- Icons live in `public/icons/` and `public/apple-touch-icon.png`. Run `npm run icons` to redraw them from the favicon mark and the theme (needs Chrome installed).
+- To test locally: `npm run build && npm run preview`, open http://localhost:4173, then check **DevTools → Application → Manifest / Service Workers**. Tick **Offline** and reload to see it work without a network.
+
 ## Tech stack
 
 From [`package.json`](package.json):
@@ -61,6 +76,7 @@ npm test           # terminal engine, data rules, generated HTML, colour contras
 npm run build      # production build into dist/
 npm run preview    # serve the production build at http://localhost:4173
 npm run og         # regenerate public/og-image.png from portfolio.json (needs Chrome installed)
+npm run icons      # regenerate the app icons in public/ from the favicon mark (needs Chrome installed)
 ```
 
 Testing helpers: add `?scene=lite` to the URL to force the phone version of the 3D scene, or `?scene=off` to turn it off.
@@ -79,6 +95,7 @@ src/
   ui/                   ← browser behaviour: terminal, nav, 3D loader
   scene/                ← three.js scene: neural field, grid, cards, skill graph
   data/                 ← turns portfolio.json into the model everything uses
+  pwa/                  ← web app manifest, service worker template, registration
 tests/                  ← Vitest tests
 ```
 
@@ -132,7 +149,7 @@ Open [`src/theme.js`](src/theme.js) and change one value:
 accent: '#39ff88',   // neon green → try '#3b82f6' for electric blue
 ```
 
-That's all you need. The CSS, the 3D scene, the terminal, the favicon and the resume all use it. Run `npm run og` to recolour the social preview image too. `npm test` checks that the new colour still meets WCAG AA contrast.
+That's all you need. The CSS, the 3D scene, the terminal, the favicon and the resume all use it. Run `npm run og` and `npm run icons` to recolour the social preview image and the app icons too. `npm test` checks that the new colour still meets WCAG AA contrast.
 
 ## Deployment (GitHub Pages)
 
@@ -140,4 +157,6 @@ The workflow in [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) r
 
 One-time setup: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
 
-The site is served from the domain root (`base: '/'` in `vite.config.js`). For a project site at `username.github.io/repo`, set `base: '/repo/'`.
+The site is served from the domain root (`BASE = '/'` in `vite.config.js`), which is also the manifest's `start_url` and `scope` and the service worker's scope. For a project site at `username.github.io/repo`, set `BASE = '/repo/'`.
+
+`vite build` also writes `dist/sw.js`, so the same workflow publishes the service worker with no extra step. Every deploy that changes the site gets a new service worker version, and visitors' old caches are replaced automatically.
