@@ -1165,10 +1165,6 @@ html:not(.js) .term-chips {
   align-items: center;
   gap: 20px;
 }
-.footer code {
-  color: var(--accent);
-  font: inherit;
-}
 .footer a,
 .link-btn {
   color: var(--text);

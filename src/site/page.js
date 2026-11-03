@@ -244,7 +244,6 @@ export function footer(d) {
     <div class="footer-inner">
       <p>© ${new Date().getFullYear()} ${esc(d.name)}${d.location ? ` · ${esc(d.location)}` : ''}</p>
       <p class="footer-meta">
-        <span>generated from <code>portfolio.json</code></span>
         <span class="footer-key">terminal <kbd>${esc(config.terminal.focusKey)}</kbd></span>
         <button type="button" class="link-btn" id="toggle-3d" hidden>3D: on</button>
         <a href="#hero">back to top ↑</a>
