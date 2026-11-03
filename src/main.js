@@ -8,3 +8,6 @@ import './styles/main.css'
 import { initNav } from './ui/nav.js'
 
 initNav()
+import { initTerminal } from './ui/terminal.js'
+
+initTerminal()

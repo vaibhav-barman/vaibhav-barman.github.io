@@ -624,3 +624,31 @@ html:not(.js) .term-chips {
     flex: 1 1 calc(50% - 12px);
   }
 }
+.js .term-static {
+  display: none;
+}
+.term-input-line {
+  display: flex;
+  align-items: baseline;
+  gap: 1ch;
+  min-height: 1.6em;
+}
+.term-input-line label {
+  flex-shrink: 0;
+  white-space: pre;
+  cursor: text;
+}
+.term-input {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+  caret-color: var(--accent);
+  font: inherit;
+}
+.term-input:focus-visible {
+  outline: none;
+}
