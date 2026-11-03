@@ -1,49 +1,54 @@
 # vaibhav-barman.github.io
 
-An immersive 3D portfolio with a working terminal, generated entirely from one JSON file.
+A dark, cinematic portfolio for an AI engineer: a three.js neural-network scene, a working terminal in the hero, and every word generated from one JSON file.
 
-**Live:** https://vaibhav-barman.github.io · **Author:** [Vaibhav Barman](https://github.com/vaibhav-barman), AI Engineer (LLM applications, RAG and AI agents)
+**Live:** https://vaibhav-barman.github.io
 
 <!--
-  SCREENSHOT / GIF: none yet. To add one:
-  1. Save an image to docs/screenshot.png (or docs/demo.gif). A 1600×900 capture of the hero with the
-     terminal overlay open works well; a 10-second GIF of `neofetch` + `projects 1` is even better.
-  2. Uncomment the line below.
+  SCREENSHOT: none yet. To add one:
+  1. Open the live site at 1440px wide and capture the hero (text on the left, terminal on the right).
+  2. Save it as docs/screenshot.png in this repo (create the docs/ folder).
+  3. Replace this comment with:  ![Portfolio hero](docs/screenshot.png)
 -->
-<!-- ![Portfolio hero with the terminal overlay open](docs/screenshot.png) -->
 
 ## Features
 
-- **3D scene** (three.js / react-three-fiber): an instanced neural-network field with pulses travelling along the links, a glowing AI core, a neon grid, and a camera that moves through each section as you scroll. Projects float as holographic cards, skills form a node graph, and experience and education sit on a glowing timeline.
-- **Interactive terminal:** embedded in the page and available anywhere as an overlay (press <kbd>`</kbd>). It has history, Tab completion, "did you mean…?" suggestions, clickable output and quick-command chips for touch screens. Commands also move the 3D camera and highlight objects.
+- **3D hero scene (three.js):** a neural-network particle field (instanced nodes, glowing links with travelling pulses) that moves aside and lights up under the mouse, over a grid floor. Bloom runs on desktop only.
+- **3D through the page:** the camera flies forward as you scroll. Featured projects float as holographic cards and skills form a 3D graph, each inside a framed panel next to its section heading. Hovering a project or a skill highlights it in 3D.
+- **Hero terminal:** a real shell in the right half of the hero. It boots, auto-types `whoami`, and supports history (↑/↓), Tab completion, "did you mean…?", clickable output and tappable command chips on phones. Press <kbd>`</kbd> anywhere to focus it.
 
   | Group | Commands |
   |---|---|
   | About me | `whoami` `about` `neofetch` `skills [group]` `experience` `education` `contact` `resume [--md]` `ask <question>` |
-  | Projects | `projects [n]` `open <n\|name> [--repo\|--live]` `github` `linkedin` |
-  | Shell | `help` `ls` `cd` `cat` `pwd` `theme <cyan\|violet\|matrix>` `3d <on\|off>` `history` `clear` `exit` |
+  | Projects & links | `projects [n]` `open <n\|name> [--repo\|--live]` `github` `linkedin` |
+  | Shell | `help` `ls` `cd` `cat` `pwd` `theme <green\|blue\|reset>` `3d <on\|off>` `history` `clear` `exit` |
   | Extras | `sudo hire-me` |
 
-- **One source of truth:** every word on the site comes from [`portfolio.json`](portfolio.json): the HTML sections, 3D cards, terminal output, virtual filesystem, printable resume, SEO tags, JSON-LD and social preview image.
-- **"Ask my portfolio":** answers questions from the JSON (offline keyword retrieval for now; the provider interface is ready for an LLM).
-- **Accessibility:** every piece of content is real, crawlable HTML; without JavaScript, a full text version is served. The terminal and dialogs have proper ARIA labels, there's keyboard navigation with visible focus, and `prefers-reduced-motion` is respected.
-- **Performance:**
-  - The 3D scene is a lazy-loaded chunk that never blocks first paint.
-  - Phones get a lighter scene, loaded on the first scroll or touch.
-  - Devices without WebGL, or with only software rendering, get a static background, and the terminal still works.
-  <!-- LIGHTHOUSE: add scores here once confirmed, e.g.
-  - Lighthouse (production build): mobile 88 · 100 · 100 · 100, desktop 99 · 100 · 100 · 100 (Performance · Accessibility · Best Practices · SEO) -->
+- **One source of truth:** [`portfolio.json`](portfolio.json) drives every section, the terminal output and its virtual files, the printable [resume page](https://vaibhav-barman.github.io/resume.html), SEO tags, JSON-LD and the social preview image.
+- **One accent colour:** set in [`src/theme.js`](src/theme.js) and used everywhere (UI, 3D, favicon, resume, OG image).
+- **Works for everyone:**
+  - The page is plain HTML rendered at build time, so it reads fine without JavaScript (the terminal shows a prerendered `whoami`).
+  - There's keyboard navigation with visible focus, and every text colour is tested for WCAG AA contrast.
+  - With `prefers-reduced-motion`, or on devices without WebGL, the 3D is replaced by a static background.
+- **Fast:**
+  - three.js loads only after the page is interactive.
+  - Phones get a lighter scene with no bloom.
+  - The pixel ratio is capped, and quality drops automatically if the frame rate falls.
+  - Lighthouse on a local production build: 100 for Performance, Accessibility, Best Practices and SEO, on mobile and desktop.
 
 ## Tech stack
 
+From [`package.json`](package.json):
+
 | Area | Packages |
 |---|---|
-| Framework | React 19, TypeScript 5.9, Vite 7 |
-| 3D | three, @react-three/fiber, @react-three/drei, @react-three/postprocessing, postprocessing, maath |
-| UI | Tailwind CSS 4, framer-motion, zustand |
-| Fonts | Space Grotesk, JetBrains Mono (self-hosted via Fontsource) |
-| Tests | Vitest |
+| Build / dev server | `vite` ^7.1 |
+| 3D | `three` ^0.180 (including its `EffectComposer` / `UnrealBloomPass` add-ons) |
+| Fonts | `@fontsource-variable/space-grotesk`, `@fontsource-variable/jetbrains-mono` (self-hosted) |
+| Tests | `vitest` ^3.2 |
 | Hosting | GitHub Pages via GitHub Actions |
+
+Plain JavaScript modules and CSS: no framework, no TypeScript, no CSS framework.
 
 ## Quick start
 
@@ -51,95 +56,88 @@ Requires Node.js 20.19+ (CI uses Node 22).
 
 ```bash
 npm install
-npm run dev        # http://localhost:5173
-npm test           # CLI engine + data tests
-npm run build      # type-check + production build to dist/
-npm run preview    # serve the production build
-npm run og         # regenerate public/og-image.png from portfolio.json (needs local Chrome)
+npm run dev        # http://localhost:5173, reloads when portfolio.json changes
+npm test           # terminal engine, data rules, generated HTML, colour contrast
+npm run build      # production build into dist/
+npm run preview    # serve the production build at http://localhost:4173
+npm run og         # regenerate public/og-image.png from portfolio.json (needs Chrome installed)
 ```
 
-## Project structure
+Testing helpers: add `?scene=lite` to the URL to force the phone version of the 3D scene, or `?scene=off` to turn it off.
+
+## Project layout
 
 ```
-portfolio.json            content: the only place to edit content
-src/config.ts             tweakables: themes, particle counts, camera, prompt, boot text, section headings
-src/data/                 types, normalizer, text + static-HTML renderers
-src/cli/                  engine (parse, history, completion, did-you-mean), session, vfs, commands/
-src/scenes/               3D: Experience, CameraRig, NeuralField, LatentDust, HeroCore, ProjectCards, SkillCluster, Timeline3D
-src/components/           Terminal, TerminalOverlay, Hud, Cursor, Loader, ProjectDialog, AskPortfolio, sections/
-src/hooks/, src/store/    scroll tracking, media queries, app state
-scripts/og-image.mjs      social preview image generator
+portfolio.json          ← all content
+index.html, resume.html ← page shells (filled in at build time)
+src/
+  theme.js              ← colours + fonts (change the accent here)
+  config.js             ← section titles, terminal settings, 3D tuning
+  site/                 ← HTML for each section, SEO tags, resume (runs at build time)
+  styles/main.css       ← all styles
+  cli/                  ← terminal engine and commands (no DOM, unit-tested)
+  ui/                   ← browser behaviour: terminal, nav, 3D loader
+  scene/                ← three.js scene: neural field, grid, cards, skill graph
+  data/                 ← turns portfolio.json into the model everything uses
+tests/                  ← Vitest tests
 ```
 
-`src/data/normalize.ts` turns the raw JSON into one typed model that everything else uses:
+## Editing portfolio.json
 
-| Consumer | Where |
-|---|---|
-| HTML sections | `src/components/sections/*` |
-| 3D scene | `src/scenes/*` |
-| Terminal + virtual filesystem | `src/cli/*` |
-| SEO tags, JSON-LD `Person`, no-JS text version | `src/data/staticHtml.ts` (injected by `vite.config.ts`) |
-| Printable resume (`/resume.html`) | `src/data/staticHtml.ts` |
-| "Ask my portfolio" | `src/ai/ask.ts` |
+Change the JSON, save, and the dev server reloads. Every section, the terminal and the resume update together.
 
-## Editing content
+- **Profile:** `name`, `label` (the title under your name), `tagline` (the one-line pitch), `status` (the badge), `contact.location`, `contact.email`, `social_links`.
+- **Projects:** each entry has `title`, `summary`, `url`, `category` (`agentic`, `rag`, `llm`, `tooling`), `featured` (featured projects come first and get a 3D card), `tags` and `highlights`.
+- **Skills** are grouped. A skill is either a plain string, or `{ "name", "note" }` when it needs a short note:
 
-Edit `portfolio.json`; the dev server reloads everything. The original schema still works; these **optional** fields were added:
+  ```json
+  "skills": [
+    { "category": "Backend", "items": ["FastAPI", "Pydantic", { "name": "Alembic", "note": "migrations" }] },
+    { "category": "Model APIs", "note": "worked with API keys for", "items": ["Anthropic", "OpenAI"] }
+  ]
+  ```
 
-| Field | Where | Effect |
-|---|---|---|
-| `tagline` | top level | One-line pitch for the hero and `whoami` (falls back to `label`) |
-| `status` | top level | Availability in the HUD, timeline and `neofetch` |
-| `featured` | project | Listed first |
-| `category` | project | `agentic`, `rag`, `llm`, `tooling`; controls ordering and labels (`config.projectCategories`) |
-| `tags` | project | Tech tags for cards, the CLI and the skills graph |
-| `repo_url` / `live_url` | project | Links for `open <n> --repo` / `--live` (`repo_url` falls back to `url`) |
-| `slug` | project | CLI id, e.g. `open gitcommit-ai` (derived from the title if omitted) |
-| `category` | skill | Skill group for the 3D cluster and `skills <group>` |
+- **`also_used_exclude`:** project tags listed here still show on their project card, but not in the "Also in my projects" chips.
+- **Education / work:** `education` and `work_experience` feed the timeline and the `education` / `experience` commands.
 
-After changing your name, role or tags, run `npm run og` to refresh the social preview image.
+Section headings and other UI copy (not resume content) live in `src/config.js` under `sections`.
 
 ## Adding a terminal command
 
-1. Export a `Command` from a file in `src/cli/commands/`:
+1. Add an object to any file in `src/cli/commands/` (or a new file):
 
-   ```ts
-   import { link, t } from '../format'
-   import type { Command } from '../types'
+   ```js
+   import { t, run } from '../format.js'
 
-   export const blog: Command = {
-     name: 'blog',
-     summary: 'open my blog',
-     group: 'navigate', // section in `help`
-     run: (args, { data, actions }) => {
-       actions.openUrl('https://example.com')
-       return [[t('opening ', 'muted'), link('example.com', 'https://example.com')]]
-     },
+   export const hello = {
+     name: 'hello',
+     summary: 'say hello',          // shown in `help`
+     group: 'fun',                  // info | navigate | system | fun
+     run: (args, { data }) => [
+       [t(`Hello from ${data.firstName}!`, 'accent')],
+       [t('try '), run('projects')], // a clickable command
+     ],
    }
    ```
 
-2. Add it to the list in `src/cli/commands/index.ts`.
+2. Add it to the list in [`src/cli/commands/index.js`](src/cli/commands/index.js).
 
-`help`, Tab completion and "did you mean" pick it up automatically. Commands receive the normalized JSON (`data`), the virtual filesystem (`fs`) and `actions` (scroll to a section, highlight 3D objects, focus a project, change the theme, open URLs, download files). Add `complete()` for argument completion; `src/cli/engine.test.ts` shows how to test a command with fake actions.
+`help`, Tab completion and "did you mean" pick it up automatically. A command returns lines. Each line is a list of pieces, which can be plain text, `t(text, tone)`, `link(text, url)` or `run(text, command)`. Tones are `accent`, `muted`, `dim`, `bold`, `ok`, `error` and `heading`.
 
-## Tweaking the look (`src/config.ts`)
+## Changing the accent colour
 
-| Key | Controls |
-|---|---|
-| `themes`, `defaultTheme` | Accent palettes used by both the UI and 3D (`theme <name>` switches at runtime) |
-| `scene.particles`, `scene.neuralNodes` | Particle / node counts for desktop and mobile |
-| `scene.maxDpr`, `scene.bloom`, `scene.vignette` | Render resolution cap and post-processing |
-| `scene.cameraDamping`, `scene.parallax`, `scene.carouselSpeed` | Motion feel |
-| `scene.anchors`, `scene.cameraOffset` | Where each section lives in 3D space |
-| `terminal.prompt`, `terminal.host`, `terminal.bootText`, `terminal.quickCommands` | Terminal prompt, boot sequence and chips |
-| `sections` | Section order, HUD labels and headings |
+Open [`src/theme.js`](src/theme.js) and change one value:
 
-## Deployment
+```js
+accent: '#39ff88',   // neon green → try '#3b82f6' for electric blue
+```
 
-Every push to `main` runs `.github/workflows/deploy.yml`: install → test → build → publish `dist/` to GitHub Pages.
+That's all you need. The CSS, the 3D scene, the terminal, the favicon and the resume all use it. Run `npm run og` to recolour the social preview image too. `npm test` checks that the new colour still meets WCAG AA contrast.
 
-**One-time setup:** go to **Settings → Pages → Build and deployment → Source: GitHub Actions**. This is a user site served from the domain root, so `base` in `vite.config.ts` is `/`.
+## Deployment (GitHub Pages)
 
-## License and credits
+The workflow in [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) runs `npm ci`, `npm test` and `npm run build` on every push to `main`, then publishes `dist/` to GitHub Pages.
 
-Content © Vaibhav Barman. Versions before 2.0 were generated with a tool based on [Corey Schafer's portfolio generator](https://github.com/CoreyMSchafer/portfolio_generator), and `portfolio.json` keeps its schema; see the original project for its license terms.
+One-time setup: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+
+The site is served from the domain root (`base: '/'` in `vite.config.js`). For a project site at `username.github.io/repo`, set `base: '/repo/'`.
