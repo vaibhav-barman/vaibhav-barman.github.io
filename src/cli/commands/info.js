@@ -22,6 +22,7 @@ export const about = {
     const out = [heading('about'), [t(d.summary)], blank]
     if (d.location) out.push([t('location   ', 'muted'), t(d.location)])
     if (d.languages.length) out.push([t('speaks     ', 'muted'), t(d.languages.map((l) => `${l.language} (${l.fluency})`).join(', '))])
+    if (d.focusAreas.length) out.push([t('focus      ', 'muted'), t(d.focusAreas.map((i) => i.name).join(' · '))])
     if (d.interests.length) out.push([t('off-screen ', 'muted'), t(d.interests.map((i) => i.name).join(' · '))])
     if (d.achievements.length) out.push([t('medals     ', 'muted'), t(d.achievements.map((a) => a.title).join(' · '), 'accent')])
     return out
@@ -107,12 +108,15 @@ function timeline(kind) {
   return (_, { data: d, actions }) => {
     actions.goTo('journey')
     actions.highlight({ kind: 'journey' })
-    const items = d.timeline.filter((x) => (kind === 'work' ? x.kind !== 'education' : x.kind === 'education'))
+    const items = kind === 'work' ? d.roles : d.education
     if (!items.length) {
       return kind === 'work'
         ? [
             [t('No professional roles listed yet.', 'muted')],
             [t('status: ', 'muted'), t(d.status, 'ok'), t(': looking for the first one. try ', 'muted'), run('sudo hire-me')],
+            ...(d.builds.length
+              ? [blank, [t('meanwhile, shipping: ', 'muted'), t(d.builds.map((b) => `${b.when} (${b.projects.length})`).join(' · ')), t('  ', 'muted'), run('projects')]]
+              : []),
           ]
         : [[t('No education listed.', 'muted')]]
     }

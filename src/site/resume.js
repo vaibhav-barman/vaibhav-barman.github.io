@@ -2,8 +2,8 @@
 import { esc } from './util.js'
 
 export function resumeContent(d) {
-  const work = d.timeline.filter((x) => x.kind !== 'education')
-  const edu = d.timeline.filter((x) => x.kind === 'education')
+  const work = d.roles
+  const edu = d.education
   const entry = (x) => `<div class="entry">
       <div class="row"><h3>${esc(x.title)}</h3><span>${esc(x.when)}</span></div>
       <div class="row sub"><span>${x.url ? `<a href="${esc(x.url)}">${esc(x.org)}</a>` : esc(x.org)}</span><span>${esc(x.location)}</span></div>

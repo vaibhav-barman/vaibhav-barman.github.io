@@ -1,6 +1,8 @@
 /*
  * Styles for the whole site. Colours and fonts are CSS variables injected
  * from src/theme.js, so this file never hard-codes the accent colour.
+ * --accent marks what is interactive or live (buttons, links, active and
+ * hover states); --secondary is for static labels (eyebrows, tags, dates).
  * Tints of the accent use color-mix(), e.g.
  *   color-mix(in srgb, var(--accent) 20%, transparent)
  */
@@ -43,6 +45,9 @@ p {
 a {
   color: var(--accent);
   text-underline-offset: 3px;
+}
+[hidden] {
+  display: none !important;
 }
 img {
   max-width: 100%;
@@ -319,7 +324,7 @@ main:focus {
   margin: 0 auto;
 }
 .eyebrow {
-  color: var(--accent);
+  color: var(--secondary);
   font: 600 14px var(--font-mono);
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -691,7 +696,7 @@ html:not(.js) .term-chips {
   position: absolute;
   width: 22px;
   height: 22px;
-  border: 0 solid color-mix(in srgb, var(--accent) 70%, transparent);
+  border: 0 solid color-mix(in srgb, var(--secondary) 70%, transparent);
 }
 .stage-corner.tl {
   top: 0;
@@ -760,7 +765,7 @@ html:not(.js) .term-chips {
   font-weight: 600;
 }
 .skill-group-index {
-  color: var(--accent);
+  color: var(--secondary);
   font: 600 14px var(--font-mono);
 }
 .skill-group-note {
@@ -781,9 +786,9 @@ html:not(.js) .term-chips {
   align-items: baseline;
   gap: 8px;
   padding: 10px 16px;
-  border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--line));
+  border: 1px solid var(--line);
   border-radius: 10px;
-  background: color-mix(in srgb, var(--accent) 5%, transparent);
+  background: color-mix(in srgb, var(--text) 4%, transparent);
   color: var(--text);
   font: 500 17px/1.25 var(--font-sans);
   transition:
@@ -863,7 +868,7 @@ html:not(.js) .term-chips {
   font: 500 14px var(--font-mono);
 }
 .project-index {
-  color: var(--accent);
+  color: var(--secondary);
   font-weight: 700;
 }
 .project-cat {
@@ -895,10 +900,10 @@ html:not(.js) .term-chips {
 }
 .tags li {
   padding: 5px 12px;
-  border: 1px solid var(--line);
+  border: 1px solid color-mix(in srgb, var(--secondary) 22%, var(--line));
   border-radius: 8px;
-  background: color-mix(in srgb, var(--text) 4%, transparent);
-  color: var(--text);
+  background: color-mix(in srgb, var(--secondary) 5%, transparent);
+  color: var(--secondary);
   font: 500 15px var(--font-mono);
 }
 .project-more {
@@ -1005,7 +1010,7 @@ html:not(.js) .term-chips {
   gap: 2px;
 }
 .facts dt {
-  color: var(--accent);
+  color: var(--secondary);
   font: 600 13px var(--font-mono);
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -1093,7 +1098,7 @@ html:not(.js) .term-chips {
   box-shadow: none;
 }
 .timeline-when {
-  color: var(--accent);
+  color: var(--secondary);
   font: 600 14px var(--font-mono);
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -1213,4 +1218,417 @@ html:not(.js) .term-chips {
 }
 .has-3d .stage::before {
   opacity: 0;
+}
+
+/* ---------- project cards: thumbnail, date, facts, inline highlights ---------- */
+.project-thumb {
+  margin: -28px -28px 22px;
+  overflow: hidden;
+  border-bottom: 1px solid var(--line);
+  border-radius: 16px 16px 0 0;
+  background: var(--bg);
+}
+.project-thumb img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1200 / 724;
+  object-fit: cover;
+  object-position: top left;
+  opacity: 0.92;
+  transition: opacity 0.25s;
+}
+.project:hover .project-thumb img,
+.project.is-lit .project-thumb img {
+  opacity: 1;
+}
+.project-date {
+  margin-left: auto;
+  color: var(--muted);
+}
+.project-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px 16px;
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.project-facts li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-left: 12px;
+  border-left: 2px solid color-mix(in srgb, var(--secondary) 55%, transparent);
+}
+.project-facts strong {
+  color: var(--text);
+  font: 700 1.3rem/1.2 var(--font-mono);
+}
+.project-facts span {
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.35;
+}
+.project-points {
+  margin: 18px 0 0;
+  padding-left: 20px;
+}
+.project-points li {
+  margin-top: 6px;
+}
+.project-points li::marker {
+  color: var(--accent);
+}
+@media (max-width: 640px) {
+  .project-thumb {
+    margin: -22px -18px 18px;
+  }
+}
+
+/* ---------- skills: "used in n projects" ---------- */
+.chip-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--secondary) 16%, transparent);
+  color: var(--secondary);
+  font: 600 12px/1 var(--font-mono);
+  align-self: center;
+}
+.chip:hover .chip-count,
+.chip.is-lit .chip-count {
+  background: color-mix(in srgb, var(--accent) 20%, transparent);
+  color: var(--accent);
+}
+.skills-legend {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+  color: var(--muted);
+  font: 500 14px var(--font-mono);
+}
+
+/* ---------- journey: shipped months ---------- */
+.timeline-item.is-build::before {
+  width: 12px;
+  height: 12px;
+  left: -34px;
+  top: 8px;
+  border-color: var(--secondary);
+  box-shadow: 0 0 12px -2px var(--secondary);
+}
+.timeline-projects {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.timeline-projects a {
+  display: inline-block;
+  padding: 5px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+  color: var(--text);
+  font: 500 15px var(--font-mono);
+  text-decoration: none;
+  transition:
+    border-color 0.2s,
+    color 0.2s;
+}
+.timeline-projects a:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ---------- contact: copy button ---------- */
+.contact-email-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+  margin-top: 16px;
+}
+.contact-email-row .contact-email {
+  margin-top: 0;
+}
+.copy-btn {
+  min-height: 40px;
+  padding: 8px 14px;
+  font-size: 14px;
+}
+
+/* ---------- notes ---------- */
+.notes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
+  gap: 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.note-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 26px 28px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  color: var(--text);
+  text-decoration: none;
+  transition:
+    border-color 0.25s,
+    box-shadow 0.25s;
+}
+.note-card:hover {
+  border-color: color-mix(in srgb, var(--accent) 60%, var(--line));
+  box-shadow: 0 24px 70px -40px var(--accent);
+}
+.note-date {
+  color: var(--secondary);
+  font: 600 13px var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.note-title {
+  margin-top: 10px;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+.note-summary {
+  margin-top: 10px;
+  color: var(--muted);
+}
+.note-more {
+  margin-top: auto;
+  padding-top: 16px;
+  color: var(--accent);
+  font: 600 15px var(--font-mono);
+}
+
+/* ---------- standalone pages (/projects/*.html, /notes/*.html) ---------- */
+.page {
+  position: relative;
+  z-index: 1;
+  padding: 128px 24px 96px;
+}
+.doc {
+  max-width: 880px;
+  margin: 0 auto;
+}
+.page-title {
+  margin-top: 14px;
+  font-size: clamp(2.3rem, 5.4vw, 3.8rem);
+  font-weight: 700;
+}
+.doc > .project-meta {
+  margin-top: 18px;
+}
+.doc .project-date {
+  margin-left: 0;
+}
+.page-lead {
+  margin-top: 20px;
+  font-size: 1.25rem;
+  line-height: 1.6;
+}
+.page-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 28px;
+}
+.doc h2 {
+  margin: 56px 0 18px;
+  font-size: 1.7rem;
+  font-weight: 600;
+}
+.doc-figure {
+  margin: 40px 0 0;
+}
+.doc-figure img {
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+.doc-figure figcaption {
+  margin-top: 10px;
+  color: var(--muted);
+  font: 500 14px var(--font-mono);
+}
+.doc-list {
+  padding-left: 22px;
+}
+.doc-list li {
+  margin-top: 10px;
+}
+.doc-list li::marker {
+  color: var(--accent);
+}
+.doc-nav {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 64px;
+}
+.doc-nav a {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--text);
+  font-weight: 600;
+  text-decoration: none;
+}
+.doc-nav a:last-child {
+  text-align: right;
+}
+.doc-nav a span {
+  color: var(--muted);
+  font: 500 13px var(--font-mono);
+}
+.doc-nav a:hover {
+  border-color: var(--accent);
+}
+.doc-meta {
+  margin-top: 14px;
+  color: var(--muted);
+  font: 500 14px var(--font-mono);
+}
+
+/* pipeline diagram (build-time SVG) */
+.pipeline-wrap {
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+}
+.pipeline {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.pl-node rect {
+  fill: var(--bg);
+  stroke: color-mix(in srgb, var(--secondary) 45%, var(--line));
+  stroke-width: 1.5;
+}
+.pl-node.is-first rect {
+  stroke: var(--accent);
+}
+.pl-node text {
+  fill: var(--text);
+  font: 500 15px var(--font-mono);
+}
+.pl-edge {
+  stroke: var(--secondary);
+  stroke-width: 1.6;
+}
+.pl-arrowhead {
+  fill: var(--secondary);
+}
+.pl-loop {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.8;
+  stroke-dasharray: 6 5;
+}
+.pl-arrowhead-loop {
+  fill: var(--accent);
+}
+.pl-loop-label {
+  fill: var(--accent);
+  font: 600 14px var(--font-mono);
+}
+.pipeline-steps {
+  margin: 20px 0 0;
+  padding-left: 24px;
+  font-family: var(--font-mono);
+  font-size: 15px;
+}
+.pipeline-steps li {
+  margin-top: 6px;
+}
+.pipeline-steps li::marker {
+  color: var(--secondary);
+}
+.pl-note {
+  color: var(--accent);
+}
+/* On phones the diagram gets too small to read: the numbered list carries it. */
+@media (max-width: 640px) {
+  .pipeline-wrap {
+    display: none;
+  }
+  .page {
+    padding: 104px 16px 72px;
+  }
+  .doc-nav {
+    grid-template-columns: 1fr;
+  }
+  .doc-nav a:last-child {
+    text-align: left;
+  }
+}
+
+/* Markdown notes */
+.prose > p,
+.prose > ul,
+.prose > ol,
+.prose > blockquote,
+.prose > pre {
+  margin-top: 18px;
+}
+.prose h2 {
+  margin-top: 44px;
+  margin-bottom: 0;
+}
+.prose h3 {
+  margin-top: 32px;
+  font-size: 1.3rem;
+}
+.prose li {
+  margin-top: 6px;
+}
+.prose li::marker {
+  color: var(--accent);
+}
+.prose code {
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--text) 8%, transparent);
+  font: 0.9em var(--font-mono);
+}
+.prose pre {
+  overflow-x: auto;
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+}
+.prose pre code {
+  padding: 0;
+  background: none;
+}
+.prose blockquote {
+  margin-left: 0;
+  padding-left: 18px;
+  border-left: 3px solid var(--secondary);
+  color: var(--muted);
+}
+.prose hr {
+  margin: 40px 0;
+  border: 0;
+  border-top: 1px solid var(--line);
 }

@@ -1,16 +1,17 @@
 {
   "name": "Vaibhav Barman",
   "label": "AI Engineer | LLM Applications, RAG & AI Agents",
-  "tagline": "I build LLM applications, RAG pipelines and agentic workflows that run reliably, often on local models.",
+  "tagline": "I build AI agents that check their own work: LLM apps, RAG pipelines and multi-agent systems, often on local models.",
   "status": "open to remote roles",
   "image_path": "img/profile.jpg",
   "contact": {
     "email": "vaibhavbarman2609@gmail.com",
     "phone": "",
     "location": "Jaipur, Rajasthan, India",
-    "website": "https://vaibhav-barman.github.io"
+    "website": "https://vaibhav-barman.github.io",
+    "booking_url": ""
   },
-  "summary": "AI engineer focused on building practical applications with large language models, retrieval-augmented generation, and agentic workflows. I develop AI-powered tools using Python, LLM APIs, local models, and backend technologies, with an emphasis on grounded responses, structured outputs, evaluation, privacy, and reliable software design. I am pursuing a B.Sc. in Computer Science at BITS Pilani and continuously building projects to deepen my skills in AI engineering.",
+  "summary": "AI engineer building LLM applications, RAG pipelines and multi-agent systems in Python, with a focus on local models, structured outputs and evaluation. I study Computer Science at BITS Pilani (B.Sc., expected 2027) and learn by shipping: ten open-source projects since August 2026.",
   "base_url": "https://vaibhav-barman.github.io",
   "social_links": [
     {
@@ -50,9 +51,40 @@
         "Detects the repository's commit convention and style profile from recent history, with a confidence score.",
         "A critic loop checks each draft against deterministic rules plus an LLM faithfulness check, and regenerates until it passes.",
         "Never stages files and refuses to commit if the staging area or HEAD changed while it was working.",
-        "Supports OpenAI, Anthropic, Gemini and local Ollama models, with an evaluation harness that replays your own history."
+        "Supports Anthropic, Gemini, Hugging Face, OpenAI, OpenRouter and Ollama (local or remote), with an evaluation harness that replays your own history."
       ],
-      "images": []
+      "images": [],
+      "shipped": "2026-10",
+      "facts": [
+        {
+          "value": "6",
+          "label": "LLM providers behind one protocol"
+        },
+        {
+          "value": "2-stage",
+          "label": "critic: rules, then faithfulness"
+        },
+        {
+          "value": "offline",
+          "label": "eval mode, no API key"
+        }
+      ],
+      "pipeline": {
+        "nodes": [
+          "Staged diff + history",
+          "Diff analyst",
+          "Context retrieval",
+          "Generator",
+          "Critic",
+          "You confirm",
+          "Staleness check + commit"
+        ],
+        "loop": {
+          "from": 4,
+          "to": 3,
+          "label": "rejected"
+        }
+      }
     },
     {
       "title": "LocalForge-AI",
@@ -72,7 +104,37 @@
         "Feeds concrete execution, linting, and test failures back into a code-repair loop.",
         "Designed for offline runtime with locally hosted open-weight models through Ollama."
       ],
-      "images": []
+      "images": [],
+      "shipped": "2026-10",
+      "facts": [
+        {
+          "value": "3",
+          "label": "role-specialised agents"
+        },
+        {
+          "value": "0",
+          "label": "network calls at runtime"
+        },
+        {
+          "value": "pytest",
+          "label": "deterministic harness"
+        }
+      ],
+      "pipeline": {
+        "nodes": [
+          "Task",
+          "Product Manager",
+          "Software Engineer",
+          "Run + lint",
+          "QA Analyzer",
+          "Package"
+        ],
+        "loop": {
+          "from": 4,
+          "to": 2,
+          "label": "repair"
+        }
+      }
     },
     {
       "title": "PromptRoute",
@@ -90,10 +152,11 @@
         "Connects local model output to an interactive web frontend.",
         "Designed for local inference without cloud API keys or per-token inference costs."
       ],
-      "images": []
+      "images": [],
+      "shipped": "2026-10"
     },
     {
-      "title": "Recovery : AI Payment Recovery Agent",
+      "title": "AI Payment Recovery Agent",
       "summary": "An AI agent prototype that classifies failed payments, selects a recovery strategy, simulates outcomes, and adapts later decisions using historical performance.",
       "url": "https://github.com/vaibhav-barman/recovery-agent",
       "featured": true,
@@ -109,12 +172,38 @@
         "Records simulated outcomes and feeds strategy-performance history into subsequent decisions.",
         "Combines a web dashboard with a FastAPI backend, SQLite, and a Groq-hosted LLM."
       ],
-      "images": [
+      "images": [],
+      "shipped": "2026-08",
+      "facts": [
         {
-          "img_path": "https://raw.githubusercontent.com/vaibhav-barman/recovery-agent/main/dashboard.png",
-          "caption": "AI payment recovery dashboard"
+          "value": "6",
+          "label": "payment-failure types modelled"
+        },
+        {
+          "value": "≤3",
+          "label": "attempts per transaction"
+        },
+        {
+          "value": "JSON",
+          "label": "diagnosis, strategy, confidence"
         }
-      ]
+      ],
+      "pipeline": {
+        "nodes": [
+          "Failed payment",
+          "Past attempts + stats",
+          "LLM diagnosis",
+          "Pick strategy",
+          "Simulate outcome",
+          "Record result"
+        ],
+        "loop": {
+          "from": 5,
+          "to": 1,
+          "label": "learn"
+        }
+      },
+      "slug": "recovery-agent"
     },
     {
       "title": "Odyssey RAG",
@@ -134,7 +223,36 @@
         "Uses Gemini embeddings and Gemini for grounded answer generation.",
         "Includes retrieval inspection and evaluation with metrics such as Recall@K and Mean Reciprocal Rank."
       ],
-      "images": []
+      "images": [],
+      "shipped": "2026-09",
+      "facts": [
+        {
+          "value": "850",
+          "label": "chunks (1,000 chars, 200 overlap)"
+        },
+        {
+          "value": "768-d",
+          "label": "Gemini embeddings"
+        },
+        {
+          "value": "top-5",
+          "label": "cosine retrieval, Recall@K + MRR"
+        }
+      ],
+      "pipeline": {
+        "nodes": [
+          "Source text",
+          "Chunk",
+          "Embed",
+          "Cosine top-5",
+          "Grounded answer"
+        ],
+        "loop": {
+          "from": 3,
+          "to": 1,
+          "label": "evaluate"
+        }
+      }
     },
     {
       "title": "Local YouTube Video Summarizer",
@@ -153,7 +271,8 @@
         "Provides command-line and Gradio web-interface workflows.",
         "Keeps transcription and summarization on the user's own machine."
       ],
-      "images": []
+      "images": [],
+      "shipped": "2026-10"
     },
     {
       "title": "GNews MCP Server",
@@ -172,7 +291,8 @@
         "Supports configurable language, country, category, date range, sorting, and result limits.",
         "Built in Python with FastMCP and managed with uv."
       ],
-      "images": []
+      "images": [],
+      "shipped": "2026-10"
     },
     {
       "title": "ApplyIQ",
@@ -192,7 +312,8 @@
         "Pairs a web frontend with a Python FastAPI backend.",
         "Includes PostgreSQL persistence with SQLAlchemy and Alembic, input validation, prompt-injection defenses, and automated tests."
       ],
-      "images": []
+      "images": [],
+      "shipped": "2026-10"
     },
     {
       "title": "Gemini Website Summarizer",
@@ -210,7 +331,30 @@
         "Uses the Google Gen AI SDK to generate summaries.",
         "Loads API credentials from local environment configuration."
       ],
-      "images": []
+      "images": [],
+      "shipped": "2026-09"
+    },
+    {
+      "title": "Spendly",
+      "summary": "A lightweight personal expense tracker built with Flask and SQLite, developed end to end with Claude Code as an agentic coding workflow.",
+      "url": "https://github.com/vaibhav-barman/spendly",
+      "featured": false,
+      "category": "web",
+      "tags": [
+        "Flask",
+        "SQLite",
+        "Python",
+        "Claude Code",
+        "pytest"
+      ],
+      "highlights": [
+        "Server-rendered Flask app with Jinja2 templates and a shared base layout.",
+        "SQLite persistence with parameterized queries kept in a single database module.",
+        "Built with Claude Code using a project CLAUDE.md, custom skills and subagents for exploration and test verification.",
+        "Tested with pytest and pytest-flask."
+      ],
+      "images": [],
+      "shipped": "2026-11"
     }
   ],
   "volunteer_experience": [],
@@ -252,14 +396,7 @@
       ]
     },
     {
-      "category": "Agentic Coding",
-      "items": [
-        "Claude Code"
-      ]
-    },
-    {
-      "category": "Model APIs",
-      "note": "worked with API keys for",
+      "category": "LLM Providers",
       "items": [
         "Anthropic",
         "OpenAI",
@@ -277,6 +414,7 @@
     },
     {
       "category": "Backend",
+      "note": "async APIs with auth, pagination and rate limiting",
       "items": [
         "FastAPI",
         "Pydantic",
@@ -285,13 +423,9 @@
           "name": "Alembic",
           "note": "migrations"
         },
-        "Async",
-        "Authentication",
-        "Authorization",
-        "Pagination",
         {
-          "name": "Rate limiting",
-          "note": "SlowAPI"
+          "name": "SlowAPI",
+          "note": "rate limiting"
         }
       ]
     },
@@ -317,7 +451,11 @@
       "category": "Tools",
       "items": [
         "Git",
-        "GitHub"
+        "GitHub",
+        {
+          "name": "Claude Code",
+          "note": "agentic coding"
+        }
       ]
     }
   ],
@@ -325,7 +463,7 @@
     "BeautifulSoup",
     "Structured output"
   ],
-  "interests": [
+  "focus_areas": [
     {
       "name": "LLM Engineering and AI Agents",
       "summary": "Building LLM-powered applications, tool-using agents, structured prompting workflows, and systems that evaluate or improve their own outputs.",
@@ -340,7 +478,9 @@
       "name": "Local-First AI",
       "summary": "Experimenting with locally hosted models and privacy-focused AI workflows that reduce reliance on cloud inference.",
       "images": []
-    },
+    }
+  ],
+  "interests": [
     {
       "name": "Gym and Fitness",
       "summary": "I enjoy strength training, staying consistent with fitness, and improving my performance over time.",

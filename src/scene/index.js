@@ -17,12 +17,16 @@ import { config } from '../config.js'
 import { theme } from '../theme.js'
 import { bus, state } from '../ui/bus.js'
 import { portfolio } from '../data/portfolio.js'
-import { createProjectCards } from './cards.js'
-import { createGrid } from './grid.js'
+import { createFloor } from './floor.js'
 import { createNeuralField, mouseState } from './neural.js'
+import { createPipelines } from './pipeline.js'
 import { createSkillCluster } from './skills.js'
 import { placeInStage } from './stage.js'
-import { damp } from './util.js'
+import { STATE_INTENSITY, STATES, sectionBlend, stateWeights } from './story.js'
+import { damp, MAX_MASKS } from './util.js'
+
+/** Page elements the network dims behind, so text stays readable. */
+const MASK_SELECTOR = '.hero-copy, .section-intro-text, .stage, .about-main, .contact, .timeline'
 
 // Let the browser paint/handle input between start-up steps.
 const yieldToBrowser = () => new Promise((resolve) => requestAnimationFrame(() => setTimeout(resolve, 0)))
@@ -56,26 +60,37 @@ export async function startScene({ mobile = false } = {}) {
     linksPerNode: cfg.linksPerNode,
     linkDistance: cfg.linkDistance,
     accent,
+    secondary: theme.secondary,
     mouse,
+    narrow: innerWidth < innerHeight,
   })
   field.uniforms.uPush.value = cfg.mouse.push
   scene.add(field.group)
-  const grid = createGrid({ accent })
-  scene.add(grid.mesh)
+  const floor = createFloor({ accent, secondary: theme.secondary, mobile, pixelRatio: renderer.getPixelRatio() })
+  scene.add(floor.mesh)
   await yieldToBrowser()
 
   // Objects that live inside the page's framed .stage windows.
-  const cards = createProjectCards({ projects: portfolio.projects, accent })
-  const skills = createSkillCluster({ groups: portfolio.skillGroups, accent })
-  // Drawn after bloom so card text and labels stay crisp.
+  const pipelines = createPipelines({ projects: portfolio.projects, accent, secondary: theme.secondary })
+  const skills = createSkillCluster({ groups: portfolio.skillGroups, projects: portfolio.projects, accent, secondary: theme.secondary })
+  // Drawn after bloom so labels stay crisp.
   const overlay = new Scene()
-  overlay.add(cards.group, skills.group)
+  overlay.add(pipelines.group, skills.group)
   const stages = [
-    { obj: cards, el: document.querySelector('[data-stage="projects"]') },
+    { obj: pipelines, el: document.querySelector('[data-stage="projects"]') },
     { obj: skills, el: document.querySelector('[data-stage="skills"]') },
   ].filter((x) => x.el)
-  // Card faces are drawn with the web fonts, so redraw once they're loaded.
-  document.fonts?.ready.then(() => cards.setAccent(state.accent ?? theme.accent))
+  // Labels are drawn with the web fonts, so redraw them once the fonts are loaded.
+  document.fonts?.ready.then(() => {
+    pipelines.refreshText()
+    skills.refreshText()
+  })
+
+  // The scroll story: which sections are on screen decides the network's shape.
+  const sectionEls = [...document.querySelectorAll('main > section[id]')]
+  const sectionIds = sectionEls.map((el) => el.id)
+  const weights = Float32Array.from(STATES, (s) => (s === 'cloud' ? 1 : 0))
+  const maskEls = [...document.querySelectorAll(MASK_SELECTOR)]
   await yieldToBrowser()
   if (renderer.compileAsync) {
     await renderer.compileAsync(scene, camera)
@@ -100,6 +115,7 @@ export async function startScene({ mobile = false } = {}) {
 
   let width = 0
   let height = 0
+  const drawSize = new Vector2()
   function resize() {
     const w = innerWidth
     const h = innerHeight
@@ -112,6 +128,7 @@ export async function startScene({ mobile = false } = {}) {
     // Keep the hero cloud filling the width on portrait screens.
     camera.fov = w < h ? 70 : 55
     camera.updateProjectionMatrix()
+    field.setResolution(...renderer.getDrawingBufferSize(drawSize).toArray())
     if (composer) {
       composer.setSize(w, h)
       // Bloom at half resolution: looks the same, a quarter of the cost.
@@ -120,6 +137,22 @@ export async function startScene({ mobile = false } = {}) {
   }
   resize()
   addEventListener('resize', resize)
+
+  // Text rectangles in NDC, for the shader to dim the network behind.
+  const masks = []
+  function updateMasks() {
+    masks.length = 0
+    const vw = innerWidth
+    const vh = innerHeight
+    const pad = 12
+    for (const el of maskEls) {
+      const r = el.getBoundingClientRect()
+      if (r.bottom < 0 || r.top > vh || r.width === 0) continue
+      masks.push([((r.left - pad) / vw) * 2 - 1, -(((r.bottom + pad) / vh) * 2 - 1), ((r.right + pad) / vw) * 2 - 1, -(((r.top - pad) / vh) * 2 - 1)])
+      if (masks.length === MAX_MASKS) break
+    }
+    field.setMasks(masks)
+  }
 
   const onPointer = (e) => {
     if (e.pointerType === 'touch') return
@@ -133,11 +166,20 @@ export async function startScene({ mobile = false } = {}) {
   const offs = [
     bus.on('accent', (c) => {
       field.setAccent(c)
-      grid.setAccent(c)
-      cards.setAccent(c)
+      floor.setAccent(c)
+      pipelines.setAccent(c)
       skills.setAccent(c)
     }),
-    bus.on('focus-project', (slug) => cards.focus(slug)),
+    bus.on('focus-project', (slug) => {
+      pipelines.focus(slug)
+      skills.hoverProject(slug)
+    }),
+    // Each terminal command sends a ripple through the network from the terminal.
+    bus.on('command', () => {
+      const r = document.getElementById('terminal')?.getBoundingClientRect()
+      if (!r || r.bottom < 0 || r.top > innerHeight) return
+      field.burst({ x: ((r.left + r.width / 2) / innerWidth) * 2 - 1, y: -(((r.top + r.height / 2) / innerHeight) * 2 - 1) })
+    }),
     bus.on('hover-skill', (slug) => skills.hoverSkill(slug)),
     bus.on('highlight', (h) => skills.highlightGroup(h?.kind === 'skills' ? (h.group ?? null) : null)),
   ]
@@ -173,6 +215,7 @@ export async function startScene({ mobile = false } = {}) {
         composer = null
       } else if (quality === 0) {
         renderer.setPixelRatio(1)
+        floor.setPixelRatio(1)
         width = 0
         resize()
       }
@@ -198,12 +241,21 @@ export async function startScene({ mobile = false } = {}) {
     camera.lookAt(look)
     camera.updateMatrixWorld()
 
-    field.update(dt, { aspect: camera.aspect, mouseOn: mouse.on })
-    grid.update(dt)
+    // Blend the network toward the shape of the section(s) on screen.
+    const target = stateWeights(sectionIds, sectionBlend(sectionEls.map((el) => el.getBoundingClientRect().top), innerHeight))
+    const kw = damp(2.5, dt)
+    let intensity = 0
+    for (let i = 0; i < STATES.length; i++) {
+      weights[i] += (target[i] - weights[i]) * kw
+      intensity += weights[i] * STATE_INTENSITY[STATES[i]]
+    }
+    field.uniforms.uIntensity.value = intensity
+    updateMasks()
+    field.update(dt, { aspect: camera.aspect, mouseOn: mouse.on, weights, anchor: look })
+    floor.update(dt)
     for (const s of stages) {
       if (!placeInStage(s.obj.group, s.el, camera, { fitHeight: s.obj.fitHeight, fitWidth: s.obj.fitWidth })) continue
-      const size = s.obj.group.userData.stageSize
-      if (s.obj === cards) cards.update(dt, time, size.w / size.h)
+      if (s.obj === pipelines) pipelines.update(dt, time)
       else skills.update(dt, time, parallax)
     }
     if (composer) composer.render(dt)
@@ -250,8 +302,8 @@ export async function startScene({ mobile = false } = {}) {
       document.removeEventListener('pointerleave', onLeave)
       document.removeEventListener('visibilitychange', onVisibility)
       field.dispose()
-      grid.dispose()
-      cards.dispose()
+      floor.dispose()
+      pipelines.dispose()
       skills.dispose()
       composer?.dispose()
       renderer.dispose()

@@ -62,11 +62,33 @@ describe('skills section', () => {
   const sk = index.slice(index.indexOf('<section id="skills"'), index.indexOf('<section id="journey"'))
   it('shows every skill as a chip, grouped, with no percentages or ratings', () => {
     for (const g of d.skillGroups) expect(sk).toContain(esc(g.name))
-    for (const s of d.skills) expect(sk).toContain(`data-skill="${s.slug}">${esc(s.name)}`)
+    for (const s of d.skills) expect(sk).toMatch(new RegExp(`data-skill="${s.slug}"[^>]*>${esc(s.name).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`))
     expect(sk).not.toMatch(/\d+%|role="meter"|★/)
   })
   it('never mentions React, TypeScript, Vite, Tailwind or JavaScript', () => {
     const projectsHtml = index.slice(index.indexOf('<section id="projects"'), index.indexOf('<section id="skills"'))
     for (const h of [sk, projectsHtml]) expect(h).not.toMatch(/\b(React|TypeScript|Vite|Tailwind|JavaScript)\b/i)
+  })
+})
+
+describe('projects section', () => {
+  const pr = index.slice(index.indexOf('<section id="projects"'), index.indexOf('<section id="skills"'))
+  it('shows facts, ship month, a thumbnail and the first highlights inline', () => {
+    const g = d.projects.find((p) => p.slug === 'gitcommit-ai')
+    expect(pr).toContain('class="project-facts"')
+    expect(pr).toContain(`${g.shippedLabel}</span>`)
+    expect(pr).toContain(esc(g.highlights[0]))
+    expect(pr).toContain('href="/projects/gitcommit-ai.html"')
+  })
+})
+
+describe('journey + contact', () => {
+  const j = index.slice(index.indexOf('<section id="journey"'), index.indexOf('<section id="contact"'))
+  it('lists shipped months with links to the projects', () => {
+    for (const b of d.builds) expect(j).toContain(b.when)
+    expect(j).toContain('href="#p-gitcommit-ai"')
+  })
+  it('has a copy-email button that is hidden until JS enables it', () => {
+    expect(index).toMatch(/<button type="button" class="btn copy-btn" data-copy="[^"]+" hidden>/)
   })
 })
