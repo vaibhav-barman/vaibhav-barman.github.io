@@ -1,4 +1,4 @@
-import { createOfflineProvider } from '../../ai/ask.js'
+import { createSemanticProvider, EMBED_MODEL_LABEL } from '../../ai/ask.js'
 import { config } from '../../config.js'
 import { theme as themeConfig } from '../../theme.js'
 import { resumeMd } from '../../data/text.js'
@@ -149,15 +149,29 @@ export const echo = {
 }
 
 let provider
+const askProvider = (data, actions) => (provider ??= createSemanticProvider(data, { loadEmbedder: actions.loadEmbedder }))
+
+/** Called by the terminal as soon as someone types "ask ", so the model is warm by the time they press Enter. */
+export function warmAsk({ data, actions }) {
+  askProvider(data, actions).warm()
+}
+
 export const ask = {
   name: 'ask',
   usage: '<question>',
-  summary: 'ask my portfolio a question',
+  summary: 'ask my portfolio (semantic search, runs in your browser)',
   group: 'info',
-  run: async (args, { data }) => {
-    if (!args.length) return [[t('usage: ask <question>   e.g. ', 'muted'), run('ask what agentic projects have you built')]]
-    provider ??= createOfflineProvider(data)
-    const a = await provider.ask(args.join(' '))
-    return [[t('» ', 'accent'), t(a.text)], ...(a.sources.length ? [[t(`  sources: ${a.sources.join(', ')}`, 'dim')]] : [])]
+  /** Shown while a slow answer is on its way (the first one loads the model). */
+  pending: () => (provider?.loaded ? 'searching…' : `searching… the first question loads a small embedding model (~23 MB, ${EMBED_MODEL_LABEL}), cached afterwards`),
+  run: async (args, { data, actions }) => {
+    if (!args.length) return [[t('usage: ask <question>   e.g. ', 'muted'), run('ask which projects run on local models')]]
+    const a = await askProvider(data, actions).ask(args.join(' '))
+    return [
+      [t('» ', 'accent'), t(a.text)],
+      ...(a.evidence ? [[t('  evidence: ', 'muted'), t(`“${a.evidence}”`)]] : []),
+      ...(a.sources.length ? [[t(`  sources: ${a.sources.join(', ')}`, 'dim')]] : []),
+      ...(a.via === 'semantic' ? [[t(`  via semantic search (${EMBED_MODEL_LABEL}, on your device)`, 'dim')]] : []),
+      ...(a.note ? [[t(`  note: ${a.note}`, 'dim')]] : []),
+    ]
   },
 }

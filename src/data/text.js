@@ -12,10 +12,12 @@ export function aboutMd(d) {
 export function projectMd(p) {
   return [
     `# ${p.title}`,
-    `[${p.categoryLabel}]${p.featured ? ' ★ featured' : ''}`,
+    `[${p.categoryLabel}]${p.featured ? ' ★ featured' : ''}${p.shippedLabel ? ` · shipped ${p.shippedLabel}` : ''}`,
     '',
     p.summary,
     '',
+    ...(p.facts.length ? [p.facts.map((f) => `${f.value} ${f.label}`).join(' · '), ''] : []),
+    ...(p.pipeline ? [`How it works: ${p.pipeline.nodes.join(' → ')}${p.pipeline.loop ? ` (loops ${p.pipeline.nodes[p.pipeline.loop.from]} → ${p.pipeline.nodes[p.pipeline.loop.to]}: ${p.pipeline.loop.label})` : ''}`, ''] : []),
     ...(p.highlights.length ? ['## Highlights', ...p.highlights.map((h) => `- ${h}`), ''] : []),
     ...(p.tags.length ? [`Stack: ${p.tags.join(', ')}`] : []),
     ...(p.repoUrl ? [`Repo:  ${p.repoUrl}`] : []),
@@ -32,7 +34,7 @@ export function skillsTxt(d) {
 }
 
 export function timelineMd(d, kind) {
-  const items = d.timeline.filter((x) => (kind === 'work' ? x.kind !== 'education' : x.kind === 'education'))
+  const items = kind === 'work' ? d.roles : d.education
   if (!items.length) return kind === 'work' ? `No roles listed yet. Status: ${d.status}.` : 'No education listed.'
   return items
     .map((x) =>
@@ -54,6 +56,7 @@ export function contactTxt(d) {
 
 export function interestsMd(d) {
   return [
+    ...(d.focusAreas.length ? ['## Focus areas', ...d.focusAreas.map((i) => `- ${i.name}${i.summary ? `: ${i.summary}` : ''}`), '', '## Off-screen'] : []),
     ...d.interests.map((i) => `- ${i.name}${i.summary ? `: ${i.summary}` : ''}`),
     ...(d.achievements.length ? ['', '## Achievements', ...d.achievements.map((a) => `- ${a.title} (${a.detail})`)] : []),
   ].join('\n')

@@ -6,10 +6,17 @@
  *
  * To switch the accent colour, change ONE value:
  *     accent: '#39ff88'   →   accent: '#3b82f6'   (electric blue)
+ *
+ * The accent means "interactive or live": buttons, links, active states, the
+ * terminal and the neural network. `secondary` is a quiet cool tone for static
+ * labels (eyebrows, tags, dates, facts) and the far background of the 3D scene,
+ * so the accent stands out where it matters.
  */
 export const theme = {
   /** The one accent colour: 3D scene, links, borders, glows, terminal, highlights. */
   accent: '#39ff88',
+  /** Static labels and background depth (9:1 on the background). */
+  secondary: '#7fb8d4',
 
   /** Near-black page background. */
   background: '#05070a',
@@ -40,6 +47,7 @@ export const theme = {
 export function cssVariables(accent = theme.accent) {
   return [
     `--accent:${accent}`,
+    `--secondary:${theme.secondary}`,
     `--bg:${theme.background}`,
     `--surface:${theme.surface}`,
     `--text:${theme.text}`,

@@ -4,7 +4,9 @@
  * Tab completion, clickable output, quick-command chips and the ` shortcut.
  */
 import { registry } from '../cli/commands/index.js'
-import { complete, execute } from '../cli/engine.js'
+import { warmAsk } from '../cli/commands/system.js'
+import { complete, execute, tokenize } from '../cli/engine.js'
+import { loadBrowserEmbedder } from '../ai/ask.js'
 import { run, t } from '../cli/format.js'
 import { inputLineHtml, linesHtml, promptHtml, promptText } from '../cli/render.js'
 import { VFS } from '../cli/vfs.js'
@@ -114,6 +116,8 @@ export function initTerminal() {
       input.blur()
     },
     isNarrow: () => columns() < 72,
+    /** `ask` uses this to load the embedding model (only on the first question). */
+    loadEmbedder: loadBrowserEmbedder,
   }
 
   const ctx = () => ({ data: d, fs, cwd, setCwd, history, actions, registry })
@@ -126,7 +130,22 @@ export function initTerminal() {
     if (history.length > config.terminal.maxHistory) history.shift()
     histIdx = null
     jumpTo = null
+    // The 3D network sends a signal out from the terminal on every command.
+    bus.emit('command', cmd)
+    // Slow commands (the first `ask` loads a model) show a status line until they finish.
+    const def = registry.get(tokenize(cmd)[0] ?? '')
+    let pendingEl = null
+    const pendingTimer = def?.pending
+      ? setTimeout(() => {
+          log.insertAdjacentHTML('beforeend', linesHtml([[t(def.pending(), 'dim')]]))
+          pendingEl = log.lastElementChild
+          pendingEl?.setAttribute('aria-busy', 'true')
+          scrollDown()
+        }, 150)
+      : 0
     const out = await execute(cmd, ctx())
+    clearTimeout(pendingTimer)
+    pendingEl?.remove()
     // Commands about a page section offer a jump link instead of scrolling
     // the page away from the terminal.
     if (jumpTo && document.getElementById(jumpTo)) {
@@ -146,6 +165,14 @@ export function initTerminal() {
       typing = null
     }
   }
+
+  let warmed = false
+  input.addEventListener('input', () => {
+    if (!warmed && /^\s*ask\s/.test(input.value)) {
+      warmed = true
+      warmAsk(ctx())
+    }
+  })
 
   input.addEventListener('keydown', (e) => {
     if (typing && e.key.length === 1) {

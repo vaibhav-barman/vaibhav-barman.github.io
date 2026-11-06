@@ -1,19 +1,25 @@
 import { createHash } from 'node:crypto'
-import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
-import { resolve, sep } from 'node:path'
+import { mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
+import { dirname, resolve, sep } from 'node:path'
 import { defineConfig } from 'vitest/config'
 import { webManifest } from './src/pwa/manifest.js'
+import { loadNotes } from './src/site/notes.js'
 import { faviconSvg } from './src/theme.js'
 
 const root = import.meta.dirname
 const DATA = resolve(root, 'portfolio.json')
+const NOTES = resolve(root, 'notes')
+// NOTES_DRAFTS=1 npm run dev  → preview draft notes locally (never set in CI).
+const notes = () => loadNotes(NOTES, { includeDrafts: process.env.NOTES_DRAFTS === '1' })
 // Deploy path. https://vaibhav-barman.github.io/ is a user site, so it is served from the root.
 const BASE = '/'
 
 /**
  * Renders the page from portfolio.json into index.html and resume.html at
  * build (and dev) time, plus SEO tags, theme colours and the favicon.
- * In dev, edits to portfolio.json or src/site/* reload the page.
+ * Also writes the standalone pages (/projects/<slug>.html, /notes/<slug>.html)
+ * from page.html, and sitemap.xml.
+ * In dev, edits to portfolio.json, notes/ or src/site/* reload the page.
  */
 function portfolioHtml() {
   let server
@@ -21,9 +27,9 @@ function portfolioHtml() {
     name: 'portfolio-html',
     configureServer(s) {
       server = s
-      s.watcher.add(DATA)
-      s.watcher.on('change', (file) => {
-        if (file === DATA || file.includes('/src/site/') || file.endsWith('/src/theme.js') || file.endsWith('/src/config.js')) {
+      s.watcher.add([DATA, NOTES])
+      s.watcher.on('all', (_event, file) => {
+        if (file === DATA || file.startsWith(NOTES) || file.includes('/src/site/') || file.endsWith('/src/theme.js') || file.endsWith('/src/config.js')) {
           s.moduleGraph.invalidateAll()
           s.ws.send({ type: 'full-reload' })
         }
@@ -31,6 +37,28 @@ function portfolioHtml() {
       s.middlewares.use('/site.webmanifest', (_req, res) => {
         res.setHeader('Content-Type', 'application/manifest+json')
         res.end(JSON.stringify(webManifest(BASE)))
+      })
+      // Standalone pages: /projects/<slug>.html and /notes/<slug>.html
+      s.middlewares.use(async (req, res, next) => {
+        const url = (req.url ?? '').split('?')[0]
+        if (!/^\/(projects|notes)\/[\w-]+\.html$/.test(url)) return next()
+        try {
+          const { renderPages } = await s.ssrLoadModule('/src/site/build.js')
+          const template = await s.transformIndexHtml(url, readFileSync(resolve(root, 'page.html'), 'utf-8'))
+          const raw = JSON.parse(readFileSync(DATA, 'utf-8'))
+          const found = renderPages(template, raw, { notes: notes() }).find((p) => '/' + p.path === url)
+          if (!found) return next()
+          res.setHeader('Content-Type', 'text/html')
+          res.end(found.html)
+        } catch (err) {
+          next(err)
+        }
+      })
+      s.middlewares.use('/sitemap.xml', async (_req, res) => {
+        const { sitemapXml } = await s.ssrLoadModule('/src/site/pages.js')
+        const { model } = await s.ssrLoadModule('/src/site/build.js')
+        res.setHeader('Content-Type', 'application/xml')
+        res.end(sitemapXml(model(JSON.parse(readFileSync(DATA, 'utf-8')), { notes: notes() })))
       })
       s.middlewares.use('/favicon.svg', async (_req, res) => {
         const { faviconSvg: icon } = await s.ssrLoadModule('/src/theme.js')
@@ -41,7 +69,28 @@ function portfolioHtml() {
     async transformIndexHtml(html, ctx) {
       const { renderHtml } = server ? await server.ssrLoadModule('/src/site/build.js') : await import('./src/site/build.js')
       const raw = JSON.parse(readFileSync(DATA, 'utf-8'))
-      return renderHtml(html, raw, { isResume: ctx.filename.endsWith('resume.html') })
+      return renderHtml(html, raw, { isResume: ctx.filename.endsWith('resume.html'), notes: notes() })
+    },
+    // Runs before the service worker plugin lists dist/, so the new pages are precached.
+    writeBundle: {
+      sequential: true,
+      order: 'pre',
+      async handler(options) {
+        const dir = options.dir
+        const templateFile = resolve(dir, 'page.html')
+        const { renderPages } = await import('./src/site/build.js')
+        const { sitemapXml } = await import('./src/site/pages.js')
+        const { model } = await import('./src/site/build.js')
+        const raw = JSON.parse(readFileSync(DATA, 'utf-8'))
+        for (const p of renderPages(readFileSync(templateFile, 'utf-8'), raw, { notes: notes() })) {
+          const file = resolve(dir, p.path)
+          mkdirSync(dirname(file), { recursive: true })
+          writeFileSync(file, p.html)
+        }
+        // page.html is only a template.
+        rmSync(templateFile)
+        writeFileSync(resolve(dir, 'sitemap.xml'), sitemapXml(model(raw, { notes: notes() })))
+      },
     },
     generateBundle() {
       this.emitFile({ type: 'asset', fileName: 'favicon.svg', source: faviconSvg() })
@@ -116,6 +165,7 @@ export default defineConfig({
       input: {
         main: resolve(root, 'index.html'),
         resume: resolve(root, 'resume.html'),
+        page: resolve(root, 'page.html'),
       },
     },
   },

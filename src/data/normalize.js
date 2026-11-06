@@ -35,6 +35,27 @@ function socialKey(label, url) {
   return slugify(label)
 }
 
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
+/** "2026-10" -> "Oct 2026" (undefined for anything else). */
+export function monthLabel(ym) {
+  const m = /^(\d{4})-(\d{2})$/.exec(ym ?? '')
+  return m && Number(m[2]) >= 1 && Number(m[2]) <= 12 ? `${MONTHS[Number(m[2]) - 1]} ${m[1]}` : undefined
+}
+
+/**
+ * How a project works, as a chain of steps plus at most one feedback loop:
+ *   { "nodes": ["Diff", "Generator", "Critic"], "loop": { "from": 2, "to": 1, "label": "rejected" } }
+ * Drawn as an SVG on the project page and as a 3D graph in the projects stage.
+ */
+function normalizePipeline(raw) {
+  const nodes = (raw?.nodes ?? []).map(String).filter(Boolean)
+  if (nodes.length < 2) return undefined
+  const l = raw.loop
+  const ok = l && Number.isInteger(l.from) && Number.isInteger(l.to) && l.from !== l.to && [l.from, l.to].every((i) => i >= 0 && i < nodes.length)
+  return { nodes, loop: ok ? { from: l.from, to: l.to, label: l.label ?? '' } : undefined }
+}
+
 function categoryRank(cat) {
   const i = config.projectCategories.order.indexOf(cat)
   return i === -1 ? 99 : i
@@ -61,7 +82,16 @@ function normalizeProjects(raw = []) {
         featured: Boolean(p.featured),
         repoUrl: p.repo_url || p.url || undefined,
         liveUrl: p.live_url || undefined,
-        images: (p.images ?? []).map((i) => ({ src: i.img_path, caption: i.caption })),
+        /** `img_small` (optional, ~640px wide) is served to phones via srcset. */
+        images: (p.images ?? []).map((i) => ({ src: i.img_path, small: i.img_small || undefined, caption: i.caption })),
+        /** Short verifiable numbers shown as a stat row: [{ value, label }]. */
+        facts: (p.facts ?? []).filter((f) => f && f.value && f.label),
+        /** "YYYY-MM" the project was first published. */
+        shipped: /^\d{4}-\d{2}$/.test(p.shipped ?? '') ? p.shipped : undefined,
+        shippedLabel: monthLabel(p.shipped),
+        pipeline: normalizePipeline(p.pipeline),
+        /** Featured projects get their own page: /projects/<slug>.html */
+        pagePath: p.featured ? `projects/${slug}.html` : undefined,
       },
     }
   })
@@ -127,6 +157,9 @@ export function normalize(raw) {
   const { skills, skillGroups } = normalizeSkills(raw.skills)
 
   const projects = normalizeProjects(raw.projects)
+  for (const s of skills) {
+    s.projects = projects.filter((p) => p.tags.some((tag) => slugify(tag) === s.slug)).map((p) => p.slug)
+  }
 
   // "Also in my projects": project tags that aren't already listed as skills,
   // most-used first, minus anything in `also_used_exclude`.
@@ -149,11 +182,24 @@ export function normalize(raw) {
     details: [...(e.gpa_cumulative ? [`CGPA ${e.gpa_cumulative}`] : []), ...(e.gpa_major ? [`Major GPA ${e.gpa_major}`] : []), ...(e.honors ?? [])],
   }))
 
-  const timeline = [
-    ...(raw.work_experience ?? []).map((w) => work(w, 'work')),
-    ...(raw.volunteer_experience ?? []).map((w) => work(w, 'volunteer')),
-    ...education,
-  ]
+  const roles = [...(raw.work_experience ?? []).map((w) => work(w, 'work')), ...(raw.volunteer_experience ?? []).map((w) => work(w, 'volunteer'))]
+
+  // "Shipped" steps: projects grouped by the month they were published, oldest first.
+  const byMonth = new Map()
+  for (const p of projects) if (p.shipped) byMonth.set(p.shipped, [...(byMonth.get(p.shipped) ?? []), p])
+  const builds = [...byMonth]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([ym, ps]) => ({
+      kind: 'build',
+      title: `Shipped ${ps.length} project${ps.length === 1 ? '' : 's'}`,
+      org: '',
+      when: monthLabel(ym),
+      details: [],
+      projects: ps.map((p) => ({ slug: p.slug, title: p.title })),
+    }))
+
+  // Journey order: roles (newest first, as written), then education, then builds in time order.
+  const timeline = [...roles, ...education, ...builds]
 
   const firstName = raw.name.split(/\s+/)[0] ?? raw.name
   const achievements = (raw.marathon?.medals ?? []).map((m) => ({
@@ -177,6 +223,7 @@ export function normalize(raw) {
     location: raw.contact?.location || undefined,
     email: raw.contact?.email || undefined,
     phone: raw.contact?.phone || undefined,
+    bookingUrl: raw.contact?.booking_url || undefined,
     website: raw.contact?.website || raw.base_url || undefined,
     baseUrl: (raw.base_url ?? raw.contact?.website ?? '').replace(/\/$/, ''),
     socials,
@@ -187,6 +234,11 @@ export function normalize(raw) {
     skillGroups,
     techTags,
     timeline,
+    /** Professional roles only (work + volunteer). */
+    roles,
+    education,
+    builds,
+    focusAreas: (raw.focus_areas ?? []).map((i) => ({ name: i.name, summary: i.summary })),
     interests: (raw.interests ?? []).map((i) => ({ name: i.name, summary: i.summary })),
     languages: raw.languages ?? [],
     achievements,

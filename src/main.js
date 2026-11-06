@@ -6,8 +6,10 @@ import '@fontsource-variable/space-grotesk'
 import '@fontsource-variable/jetbrains-mono'
 import './styles/main.css'
 import { initNav } from './ui/nav.js'
+import { initCopy } from './ui/copy.js'
 
 initNav()
+initCopy()
 import { initTerminal } from './ui/terminal.js'
 
 initTerminal()

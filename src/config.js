@@ -5,12 +5,13 @@
 export const config = {
   /** Ordering + display names for project.category values in the JSON. */
   projectCategories: {
-    order: ['agentic', 'rag', 'llm', 'tooling'],
+    order: ['agentic', 'rag', 'llm', 'tooling', 'web'],
     labels: {
       agentic: 'Agentic AI',
       rag: 'RAG',
       llm: 'LLM app',
       tooling: 'AI tooling',
+      web: 'Web app',
     },
   },
 
@@ -26,15 +27,15 @@ export const config = {
       label: 'projects',
       eyebrow: '~/projects',
       title: "Things I've built.",
-      lead: 'Agentic and AI-first work first. Hover a project to bring its card forward.',
-      stage: 'fig.01 · featured work',
+      lead: 'Agentic and AI-first work first. Hover a featured project to see how it works.',
+      stage: 'fig.01 · how it works',
     },
     {
       id: 'skills',
       label: 'skills',
       eyebrow: 'skills.txt',
       title: 'The stack.',
-      lead: 'Grouped by category. Hover a skill to light it up in the graph.',
+      lead: 'Grouped by category. Hover a skill to see which projects use it.',
       stage: 'fig.02 · skill graph',
     },
     {
@@ -44,6 +45,15 @@ export const config = {
       title: 'The path so far.',
       /** Shown as the last timeline step while work_experience is empty. */
       next: 'Your team?',
+    },
+    {
+      id: 'notes',
+      label: 'notes',
+      eyebrow: '~/notes',
+      title: 'Notes.',
+      lead: 'Short write-ups on how I build and evaluate AI systems.',
+      /** Only shown (with its nav link) when notes/ has published notes. */
+      optional: true,
     },
     { id: 'contact', label: 'contact', eyebrow: 'contact.txt', title: "Let's build something." },
   ],
