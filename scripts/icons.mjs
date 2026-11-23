@@ -9,7 +9,7 @@
  *   apple-touch-icon.png                     180×180, opaque, iOS home screen
  */
 import { execFileSync } from 'node:child_process'
-import { existsSync, mkdirSync, mkdtempSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { appIconSvg } from '../src/theme.js'
@@ -35,6 +35,9 @@ const icons = [
   { file: 'icons/icon-512.png', size: 512, scale: 1.45 },
   { file: 'icons/icon-maskable-512.png', size: 512, scale: 1 },
   { file: 'apple-touch-icon.png', size: 180, scale: 1.4 },
+  // browser-tab favicons: the ball fills the square so it stays readable at 16-32px
+  { file: 'favicon-32.png', size: 32, scale: 1.55 },
+  { file: 'favicon-48.png', size: 48, scale: 1.55 },
 ]
 
 mkdirSync(join(root, 'public/icons'), { recursive: true })
@@ -50,3 +53,18 @@ for (const { file, size, scale } of icons) {
   )
   console.log(`wrote public/${file} (${size}×${size})`)
 }
+
+// favicon.ico: a one-image ICO that embeds the 48px PNG (supported by every browser that still asks for .ico)
+const png = readFileSync(join(root, 'public/favicon-48.png'))
+const head = Buffer.alloc(22)
+head.writeUInt16LE(1, 2) // type: icon
+head.writeUInt16LE(1, 4) // one image
+head.writeUInt8(48, 6)
+head.writeUInt8(48, 7)
+head.writeUInt16LE(1, 10) // colour planes
+head.writeUInt16LE(32, 12) // bits per pixel
+head.writeUInt32LE(png.length, 14)
+head.writeUInt32LE(22, 18)
+writeFileSync(join(root, 'public/favicon.ico'), Buffer.concat([head, png]))
+rmSync(join(root, 'public/favicon-48.png'))
+console.log('wrote public/favicon.ico (48×48)')

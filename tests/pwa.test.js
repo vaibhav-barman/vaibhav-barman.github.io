@@ -31,6 +31,22 @@ describe('web manifest', () => {
     for (const i of m.icons) expect(existsSync(`public${i.src}`), i.src).toBe(true)
   })
 
+  it('describes the app and offers shortcuts that point at real places', () => {
+    expect(m.description).toMatch(/AI engineer/)
+    expect(m.categories).toContain('portfolio')
+    expect(m.shortcuts.map((x) => x.url)).toEqual(['/#projects', '/resume.html', '/#contact'])
+    for (const x of m.shortcuts) expect(x.icons[0].src).toMatch(/^\/icons\//)
+    expect(webManifest('/repo/').shortcuts[1].url).toBe('/repo/resume.html')
+  })
+
+  it('has real favicon files: a valid .ico and a 32px png', () => {
+    const ico = readFileSync('public/favicon.ico')
+    expect([ico.readUInt16LE(2), ico.readUInt16LE(4)]).toEqual([1, 1]) // icon type, one image
+    expect(ico.subarray(22, 30).toString('hex')).toBe('89504e470d0a1a0a') // embedded PNG
+    const png = readFileSync('public/favicon-32.png')
+    expect([png.readUInt32BE(16), png.readUInt32BE(20)]).toEqual([32, 32])
+  })
+
   it('prefixes paths with the base for project sites', () => {
     const p = webManifest('/repo/')
     expect(p.start_url).toBe('/repo/')
@@ -46,6 +62,8 @@ describe('<head> tags', () => {
       expect(html).toContain('<link rel="manifest" href="/site.webmanifest">')
       expect(html).toContain('<link rel="apple-touch-icon" href="/apple-touch-icon.png">')
       expect(html).toContain('apple-mobile-web-app-capable')
+      expect(html).toContain('<link rel="icon" href="/favicon.svg" type="image/svg+xml" />')
+      expect(html).toContain('<link rel="icon" href="/favicon.ico" sizes="48x48" />')
       expect(existsSync('public/apple-touch-icon.png')).toBe(true)
     })
   }
