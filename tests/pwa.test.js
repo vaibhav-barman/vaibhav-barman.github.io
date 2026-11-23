@@ -17,9 +17,10 @@ describe('web manifest', () => {
   })
 
   it('takes its colours from the theme', () => {
-    expect(m.background_color).toBe('#05070a')
+    expect(m.background_color).toBe('#000000')
     expect(m.background_color).toBe(theme.background)
-    expect(m.theme_color).toBe(theme.accent)
+    expect(m.theme_color).toBe('#000000')
+    expect(m.theme_color).toBe(theme.background)
   })
 
   it('declares 192, 512 and maskable 512 icons that exist', () => {

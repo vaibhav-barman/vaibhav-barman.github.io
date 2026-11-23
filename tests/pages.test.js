@@ -62,12 +62,30 @@ describe('standalone pages', () => {
 
   it('project pages show facts, the pipeline diagram and its text version', () => {
     const g = pages.find((p) => p.path === 'projects/gitcommit-ai.html').html
-    expect(g).toContain('<h1 id="page-title" class="page-title">GitCommit AI</h1>')
-    expect(g).toContain('class="project-facts"')
-    expect(g).toMatch(/<svg class="pipeline"[^>]*role="img"/)
+    expect(g).toContain('<h1 id="page-title" class="page-title chrome">GitCommit AI</h1>')
+    expect(g).toContain('class="spec"')
+    expect(g).toMatch(/<svg class="fx-svg fx-wide"[^>]*role="img"/)
+    expect(g).toMatch(/<svg class="fx-svg fx-tall"[^>]*aria-hidden="true"/)
+    expect(g).toContain('<animateMotion')
     expect(g).toContain('class="pipeline-steps"')
+    expect(g).toContain('<strong>run</strong>: Staged diff + history → Diff analyst')
     expect(g).toContain('<link rel="canonical" href="https://vaibhav-barman.github.io/projects/gitcommit-ai.html">')
     expect(g).toContain('og:type" content="article"')
+  })
+
+  it('every flagship has its own page with the real route list', () => {
+    const blog = pages.find((p) => p.path === 'projects/blog-writing-agent.html').html
+    expect(blog).toContain('<strong>closed book</strong>: START → router → orchestrator → worker 1')
+    expect(blog).toContain('<strong>with research</strong>')
+    const crag = pages.find((p) => p.path === 'projects/corrective-rag.html').html
+    for (const r of ['CORRECT', 'INCORRECT', 'AMBIGUOUS']) expect(crag).toContain(`<strong>${r}</strong>`)
+  })
+
+  it('never reuses an id on a page', () => {
+    for (const p of pages) {
+      const ids = [...p.html.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1])
+      expect(ids.filter((id, i) => ids.indexOf(id) !== i), p.path).toEqual([])
+    }
   })
 
   it('shows the Notes section and nav link only when there are notes', () => {

@@ -3,8 +3,9 @@
  * (/projects/<slug>.html) and one per published note (/notes/<slug>.html).
  * Plain HTML: no terminal and no 3D, so they load instantly and print well.
  */
-import { assetUrl, footer, imgSrcset, nav, projectFacts } from './page.js'
-import { pipelineSvg } from './pipeline-svg.js'
+import { graphSummary } from '../data/graph.js'
+import { assetUrl, corners, footer, imgSrcset, nav, projectFacts } from './page.js'
+import { graphDiagram } from './pipeline-svg.js'
 import { esc, html, pad2, truncate } from './util.js'
 
 const external = (url) => (/^https?:/.test(url) ? ' target="_blank" rel="noopener noreferrer"' : '')
@@ -20,25 +21,26 @@ export function projectPage(d, p) {
   const next = featured[(at + 1) % featured.length]
   const img = p.images[0]
   const links = [
-    p.repoUrl && `<a class="btn btn-primary" href="${esc(p.repoUrl)}"${external(p.repoUrl)}>Repository <span aria-hidden="true">↗</span><span class="sr-only"> (opens in a new tab)</span></a>`,
+    p.repoUrl && `<a class="btn" href="${esc(p.repoUrl)}"${external(p.repoUrl)}>Repository <span aria-hidden="true">↗</span><span class="sr-only"> (opens in a new tab)</span></a>`,
     p.liveUrl && `<a class="btn" href="${esc(p.liveUrl)}"${external(p.liveUrl)}>Live demo <span aria-hidden="true">↗</span><span class="sr-only"> (opens in a new tab)</span></a>`,
-    `<a class="btn" href="/#p-${esc(p.slug)}">All projects</a>`,
+    `<a class="btn" href="/#${p.showcase ? `p-${esc(p.slug)}` : 'projects'}">All projects</a>`,
   ].filter(Boolean)
+  const routes = graphSummary(p.graph)
   const body = `<main id="main" class="page" tabindex="-1">
     <article class="doc" aria-labelledby="page-title">
-      <p class="eyebrow"><span aria-hidden="true">// </span>~/projects/${esc(p.slug)}.md</p>
-      <h1 id="page-title" class="page-title">${esc(p.title)}</h1>
-      <p class="project-meta"><span class="project-index">${pad2(p.index)}</span><span class="project-cat">${esc(p.categoryLabel)}</span>${p.featured ? '<span class="project-star">featured</span>' : ''}${p.shippedLabel ? `<span class="project-date">shipped ${esc(p.shippedLabel)}</span>` : ''}</p>
+      <p class="eyebrow">~/projects/${esc(p.slug)}.md</p>
+      <h1 id="page-title" class="page-title chrome">${esc(p.title)}</h1>
+      <p class="project-meta"><span class="project-index">${p.slot ? `P / ${pad2(p.slot)}` : pad2(p.index)}</span><span>${esc(p.categoryLabel)}</span>${p.shippedLabel ? `<span>shipped ${esc(p.shippedLabel)}</span>` : ''}</p>
       <p class="page-lead">${esc(p.summary)}</p>
       ${projectFacts(p)}
       <p class="page-actions">${links.join('')}</p>
       ${img ? `<figure class="doc-figure"><img src="${esc(assetUrl(img.src))}"${imgSrcset(img, '(max-width: 912px) calc(100vw - 32px), 880px')} alt="${esc(img.caption || `Screenshot of ${p.title}`)}" width="1200" height="724" decoding="async">${img.caption ? `<figcaption>${esc(img.caption)}</figcaption>` : ''}</figure>` : ''}
       ${
-        p.pipeline
+        p.graph
           ? `<section aria-labelledby="how-title">
         <h2 id="how-title">How it works</h2>
-        <div class="pipeline-wrap">${pipelineSvg(p.pipeline, { title: `How ${p.title} works` })}</div>
-        <ol class="pipeline-steps">${p.pipeline.nodes.map((n, i) => `<li>${esc(n)}${p.pipeline.loop?.from === i ? ` <span class="pl-note">↺ ${p.pipeline.loop.label ? `${esc(p.pipeline.loop.label)}: ` : ''}back to “${esc(p.pipeline.nodes[p.pipeline.loop.to])}”</span>` : ''}</li>`).join('')}</ol>
+        <div class="panel fx-panel">${corners()}${graphDiagram(p.graph, { id: `pg-${p.slug}`, title: `How ${p.title} works` })}</div>
+        <ul class="pipeline-steps">${routes.map((r) => `<li><strong>${esc(r.name)}</strong>: ${r.steps.map(esc).join(' → ')}</li>`).join('')}</ul>
       </section>`
           : ''
       }
@@ -47,7 +49,7 @@ export function projectPage(d, p) {
           ? `<section aria-labelledby="what-title"><h2 id="what-title">What it does</h2><ul class="doc-list">${p.highlights.map((h) => `<li>${esc(h)}</li>`).join('')}</ul></section>`
           : ''
       }
-      ${p.tags.length ? `<section aria-labelledby="stack-title"><h2 id="stack-title">Stack</h2><ul class="tags">${p.tags.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></section>` : ''}
+      ${p.tags.length ? `<section aria-labelledby="stack-title"><h2 id="stack-title">Stack</h2><ul class="chips">${p.tags.map((x) => `<li class="chip">${esc(x)}</li>`).join('')}</ul></section>` : ''}
       ${
         featured.length > 1
           ? `<nav class="doc-nav" aria-label="More projects">
@@ -69,8 +71,8 @@ export function projectPage(d, p) {
 export function notePage(d, n) {
   const body = `<main id="main" class="page" tabindex="-1">
     <article class="doc prose" aria-labelledby="page-title">
-      <p class="eyebrow"><span aria-hidden="true">// </span>~/notes/${esc(n.slug)}.md</p>
-      <h1 id="page-title" class="page-title">${esc(n.title)}</h1>
+      <p class="eyebrow">~/notes/${esc(n.slug)}.md</p>
+      <h1 id="page-title" class="page-title chrome">${esc(n.title)}</h1>
       <p class="doc-meta">${n.date ? `<time datetime="${esc(n.date)}">${esc(n.dateLabel)}</time> · ` : ''}${esc(d.name)}</p>
       ${n.html}
       <p class="page-actions"><a class="btn" href="/#notes">All notes</a><a class="btn" href="/#contact">Get in touch</a></p>

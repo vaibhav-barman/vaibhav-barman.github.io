@@ -27,7 +27,7 @@ export function webManifest(base = '/') {
     display: 'standalone',
     orientation: 'any',
     background_color: theme.background,
-    theme_color: theme.accent,
+    theme_color: theme.background,
     icons: ICONS.map((i) => ({ ...i, src: base + i.src })),
   }
 }

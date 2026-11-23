@@ -5,10 +5,30 @@ import { monthLabel, normalize, slugify } from '../src/data/normalize.js'
 describe('normalize', () => {
   const d = normalize(raw)
 
-  it('lists featured projects first and numbers them from 1', () => {
-    const firstNonFeatured = d.projects.findIndex((p) => !p.featured)
-    expect(d.projects.slice(firstNonFeatured).every((p) => !p.featured)).toBe(true)
+  it('lists the home-page projects first, in the page\'s order, and numbers all projects from 1', () => {
     expect(d.projects.map((p) => p.index)).toEqual(d.projects.map((_, i) => i + 1))
+    const shown = d.projects.filter((p) => p.showcase)
+    expect(d.projects.slice(0, shown.length)).toEqual(shown)
+    // so `projects 2` in the terminal is "P / 02" on the page
+    for (const p of shown) expect(p.index).toBe(p.slot)
+    // the rest: featured first, then by category
+    const rest = d.projects.slice(shown.length)
+    const firstPlain = rest.findIndex((p) => !p.featured)
+    expect(firstPlain === -1 || rest.slice(firstPlain).every((p) => !p.featured)).toBe(true)
+  })
+
+  it('without a showcase flag (older JSON) falls back to featured first, then category', () => {
+    const old = normalize({
+      name: 'A',
+      summary: '',
+      projects: [
+        { title: 'Plain', summary: '', category: 'web' },
+        { title: 'Star', summary: '', category: 'web', featured: true },
+        { title: 'Agent', summary: '', category: 'agentic' },
+      ],
+    })
+    expect(old.projects.map((p) => p.title)).toEqual(['Star', 'Agent', 'Plain'])
+    expect(old.flagships).toEqual([])
   })
 
   it('derives unique slugs', () => {
@@ -51,12 +71,63 @@ describe('normalize', () => {
   })
 
   it('builds the journey from roles, education and ship months', () => {
-    expect(d.roles).toEqual([])
+    expect(d.roles).toHaveLength(1)
+    expect(d.roles[0]).toMatchObject({ title: 'AI/ML Intern', org: 'Elevate Labs', when: '' })
     expect(d.education[0].org).toBe('BITS Pilani')
     const months = d.builds.map((b) => b.when)
     expect(months).toEqual(['Aug 2026', 'Sep 2026', 'Oct 2026', 'Nov 2026'])
-    expect(d.builds.flatMap((b) => b.projects)).toHaveLength(d.projects.length)
+    // only projects with a known ship month appear (the newer showcase repos have none: no invented dates)
+    expect(d.builds.flatMap((b) => b.projects)).toHaveLength(d.projects.filter((p) => p.shipped).length)
     expect(d.timeline.at(-1).kind).toBe('build')
+  })
+
+  it('splits the home page into flagships and more builds, in the author\'s order', () => {
+    expect(d.flagships.map((p) => p.title)).toEqual(['Blog Writing Agent', 'Self-RAG', 'Corrective RAG'])
+    expect(d.moreBuilds.map((p) => p.title)).toEqual(['GitCommit AI', 'LocalForge-AI', 'Glossa', 'AI Payment Recovery Agent', 'GNews MCP Server', 'Odyssey RAG'])
+    expect([...d.flagships, ...d.moreBuilds].map((p) => p.slot)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9])
+    expect(d.flagships.every((p) => p.graph && p.pagePath)).toBe(true)
+    // every showcased build has a wireframe solid; the rest stay out of the home page but in the model
+    expect(d.moreBuilds.every((p) => p.solid)).toBe(true)
+    const hidden = d.projects.filter((p) => !p.showcase).map((p) => p.title)
+    expect(hidden).toEqual(expect.arrayContaining(['PromptRoute', 'Local YouTube Video Summarizer', 'ApplyIQ', 'Gemini Website Summarizer', 'Spendly']))
+    expect(hidden).toHaveLength(5)
+  })
+
+  it('links to the real repos (canonical URLs)', () => {
+    const url = (t) => d.projects.find((p) => p.title === t).repoUrl
+    expect(url('Blog Writing Agent')).toBe('https://github.com/vaibhav-barman/blog-wriring-agent')
+    expect(url('Self-RAG')).toBe('https://github.com/vaibhav-barman/self-rag')
+    expect(url('Corrective RAG')).toBe('https://github.com/vaibhav-barman/corrective-rag')
+    expect(url('Glossa')).toBe('https://github.com/vaibhav-barman/Glossa')
+  })
+
+  it('reads the hero and whoami copy from the JSON', () => {
+    expect(d.subtitle).toBe('AI ENGINEER / AGENTS / RAG / MCP')
+    expect(d.status).toBe('open to remote AI engineering roles')
+    expect(d.taglines.length).toBeGreaterThanOrEqual(3)
+    expect(d.manifest.map((r) => r.key)).toEqual(['name', 'role', 'builds', 'stack', 'principle', 'studying', 'status'])
+    expect(d.manifest.find((r) => r.key === 'principle').value).toBe('checks over model opinion')
+    expect(d.manifest.find((r) => r.key === 'studying').value).toBe('B.S. Computer Science @ BITS Pilani')
+  })
+
+  it('falls back sensibly when the new hero fields are missing', () => {
+    const bare = normalize({ name: 'A B', label: 'AI Engineer | x', tagline: 't', summary: '' })
+    expect(bare.taglines).toEqual(['t'])
+    expect(bare.subtitle).toBe('AI Engineer')
+    expect(bare.flagships).toEqual([])
+    expect(bare.certifications).toEqual([])
+    expect(bare.manifest.map((r) => r.key)).toEqual(['name', 'role', 'status'])
+  })
+
+  it('lists the five certifications, with an issuer only where one is known', () => {
+    expect(d.certifications.map((c) => c.name)).toEqual([
+      'AI Engineer Bootcamp 2026',
+      'Complete MCP Developer Guide',
+      'Mastering Ollama',
+      'Docker & Kubernetes Fundamentals',
+      'Deloitte Australia Data Analytics simulation',
+    ])
+    expect(d.certifications.map((c) => c.issuer)).toEqual([undefined, undefined, undefined, 'Scaler Academy', 'Forage'])
   })
 
   it('links skills to the projects that use them', () => {
@@ -75,7 +146,7 @@ describe('normalize', () => {
 
 describe('portfolio.json content rules', () => {
   const d = normalize(raw)
-  const BANNED = /\b(react|typescript|vite|tailwind(\s*css)?|javascript)\b/i
+  const BANNED = /\b(react|typescript|vite|tailwind(\s*css)?|javascript|scikit-learn|sklearn|seaborn)\b/i
 
   it('never lists React, TypeScript, Vite, Tailwind CSS or JavaScript as skills or tags', () => {
     for (const s of d.skills) expect(s.name).not.toMatch(BANNED)
@@ -99,7 +170,20 @@ describe('portfolio.json content rules', () => {
       'Cloud & DevOps',
       'Tools',
     ])
-    expect(d.skills).toHaveLength(34)
+    expect(d.skills).toHaveLength(35)
     expect(JSON.stringify(raw.skills)).not.toMatch(/proficiency/)
+  })
+
+  it('lists exactly the stack from the brief', () => {
+    const names = d.skills.map((s) => s.name)
+    for (const want of [
+      'Python', 'SQL', 'PostgreSQL', 'MySQL', 'SQLite', 'Neo4j / Cypher', 'LangGraph', 'LangChain', 'MCP', 'FastMCP', 'RAG', 'Ollama',
+      'Claude Code', 'Anthropic', 'OpenAI', 'Gemini', 'Groq', 'NVIDIA', 'FastAPI', 'Pydantic', 'SQLAlchemy', 'Alembic', 'ChromaDB',
+      'Pinecone', 'Redis', 'AWS S3', 'EC2', 'Lambda', 'Boto3', 'Docker', 'Nginx', 'Ubuntu', 'Git', 'GitHub',
+    ]) {
+      expect(names, want).toContain(want)
+    }
+    expect(names).not.toContain('Local LLMs')
+    expect(names).not.toContain('SlowAPI')
   })
 })

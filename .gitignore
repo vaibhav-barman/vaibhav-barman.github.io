@@ -15,3 +15,6 @@ __pycache__/
 env/
 venv/
 *.pdf
+
+# output of `npm run qa -- --shots`
+qa-shots/

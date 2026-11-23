@@ -1,6 +1,5 @@
 import { createSemanticProvider, EMBED_MODEL_LABEL } from '../../ai/ask.js'
 import { config } from '../../config.js'
-import { theme as themeConfig } from '../../theme.js'
 import { resumeMd } from '../../data/text.js'
 import { blank, heading, link, pad, run, t } from '../format.js'
 
@@ -50,31 +49,6 @@ export const history = {
   run: (_, { history }) => history.map((h, i) => [t(String(i + 1).padStart(4) + '  ', 'muted'), run(h)]),
 }
 
-export const theme = {
-  name: 'theme',
-  usage: `<${Object.keys(themeConfig.presets).join('|')}>`,
-  summary: 'switch the accent colour (UI + 3D)',
-  group: 'system',
-  complete: () => [...Object.keys(themeConfig.presets), 'reset'],
-  run: (args, { actions }) => {
-    const names = Object.keys(themeConfig.presets)
-    const want = args[0]?.toLowerCase()
-    if (!want) {
-      return [
-        [t('current: ', 'muted'), t(actions.getTheme(), 'accent')],
-        [t('available: ', 'muted'), ...[...names, 'reset'].flatMap((n, i) => [...(i ? [t(' · ', 'dim')] : []), run(n, `theme ${n}`)])],
-      ]
-    }
-    if (want === 'reset') {
-      actions.setTheme(null)
-      return [[t('theme → ', 'muted'), t('default', 'accent')]]
-    }
-    if (!names.includes(want)) return [[t(`unknown theme "${want}". try: ${names.join(', ')}`, 'error')]]
-    actions.setTheme(want)
-    return [[t('theme → ', 'muted'), t(want, 'accent')]]
-  },
-}
-
 export const threeD = {
   name: '3d',
   usage: '<on|off>',
@@ -84,7 +58,7 @@ export const threeD = {
   run: (args, { actions }) => {
     const { enabled, available } = actions.get3D()
     const want = args[0]?.toLowerCase()
-    if (!available) return [[t('3D is not available here (no WebGL or reduced motion); showing the static background.', 'muted')]]
+    if (!available) return [[t('3D is not available here (no WebGL); showing the static chrome sphere instead.', 'muted')]]
     if (!want) return [[t('3d: ', 'muted'), t(enabled ? 'on' : 'off', 'accent'), t('  (', 'muted'), run(enabled ? '3d off' : '3d on'), t(')', 'muted')]]
     if (want !== 'on' && want !== 'off') return [[t('usage: 3d <on|off>', 'error')]]
     actions.set3D(want === 'on')

@@ -35,6 +35,7 @@ export function resumeContent(d) {
       )
       .join('')}</section>
     ${edu.length ? `<section><h2>Education</h2>${edu.map(entry).join('')}</section>` : ''}
+    ${d.certifications.length ? `<section><h2>Certifications</h2><ul>${d.certifications.map((c) => `<li>${esc(c.name)}${c.issuer ? ` <span class="sub">(${esc(c.issuer)})</span>` : ''}</li>`).join('')}</ul></section>` : ''}
     <section><h2>Skills</h2>${d.skillGroups
       .map((g) => `<p><strong>${esc(g.name)}:</strong> ${esc(g.skills.map((s) => (s.note ? `${s.name} (${s.note})` : s.name)).join(', '))}</p>`)
       .join('')}</section>

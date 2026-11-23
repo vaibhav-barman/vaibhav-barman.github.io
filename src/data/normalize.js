@@ -4,6 +4,7 @@
  * imported by vite.config.js at build time.
  */
 import { config } from '../config.js'
+import { graphFromPipeline, normalizeGraph } from './graph.js'
 
 export function slugify(input) {
   return String(input)
@@ -44,9 +45,9 @@ export function monthLabel(ym) {
 }
 
 /**
- * How a project works, as a chain of steps plus at most one feedback loop:
+ * Legacy "how it works": a chain of steps plus at most one feedback loop:
  *   { "nodes": ["Diff", "Generator", "Critic"], "loop": { "from": 2, "to": 1, "label": "rejected" } }
- * Drawn as an SVG on the project page and as a 3D graph in the projects stage.
+ * Richer agents use `graph` instead (see data/graph.js); both end up as `project.graph`.
  */
 function normalizePipeline(raw) {
   const nodes = (raw?.nodes ?? []).map(String).filter(Boolean)
@@ -61,6 +62,9 @@ function categoryRank(cat) {
   return i === -1 ? 99 : i
 }
 
+const SHOWCASE = ['flagship', 'build']
+const SOLIDS = ['icosahedron', 'dodecahedron', 'octahedron', 'tetrahedron', 'cube', 'stella']
+
 function normalizeProjects(raw = []) {
   const seen = new Set()
   const withMeta = raw.map((p, original) => {
@@ -68,6 +72,7 @@ function normalizeProjects(raw = []) {
     while (seen.has(slug)) slug += '-2'
     seen.add(slug)
     const category = (p.category ?? 'other').toLowerCase()
+    const pipeline = normalizePipeline(p.pipeline)
     return {
       original,
       project: {
@@ -89,16 +94,30 @@ function normalizeProjects(raw = []) {
         /** "YYYY-MM" the project was first published. */
         shipped: /^\d{4}-\d{2}$/.test(p.shipped ?? '') ? p.shipped : undefined,
         shippedLabel: monthLabel(p.shipped),
-        pipeline: normalizePipeline(p.pipeline),
+        pipeline,
+        /** How it works: `graph` (nodes, edges, packet routes), or the legacy chain adapted to one. */
+        graph: normalizeGraph(p.graph) ?? (pipeline ? graphFromPipeline(pipeline) : undefined),
+        /** "flagship" (big card + diagram) or "build" (grid card); anything else is not shown on the home page. */
+        showcase: SHOWCASE.includes(p.showcase) ? p.showcase : undefined,
+        /** Wireframe solid drawn on the card. */
+        solid: SOLIDS.includes(p.solid) ? p.solid : undefined,
+        /** Position in portfolio.json (the home page keeps the author's order). */
+        order: original,
         /** Featured projects get their own page: /projects/<slug>.html */
         pagePath: p.featured ? `projects/${slug}.html` : undefined,
       },
     }
   })
+  // Order: the projects shown on the home page first, exactly as the page lists them (flagships, then
+  // "more builds", each in the author's order), so `projects 2` in the terminal is P / 02 on the page.
+  // Everything else follows: featured first, then by category, then in the author's order.
+  const shown = (p) => (p.showcase === 'flagship' ? 0 : p.showcase === 'build' ? 1 : 2)
   withMeta.sort(
     (a, b) =>
-      Number(b.project.featured) - Number(a.project.featured) ||
-      categoryRank(a.project.category) - categoryRank(b.project.category) ||
+      shown(a.project) - shown(b.project) ||
+      (shown(a.project) < 2
+        ? 0
+        : Number(b.project.featured) - Number(a.project.featured) || categoryRank(a.project.category) - categoryRank(b.project.category)) ||
       a.original - b.original,
   )
   return withMeta.map((m, i) => ({ ...m.project, index: i + 1 }))
@@ -201,12 +220,34 @@ export function normalize(raw) {
   // Journey order: roles (newest first, as written), then education, then builds in time order.
   const timeline = [...roles, ...education, ...builds]
 
+  // The home page shows flagships, then "more builds", each in the author's order, numbered P / 01...
+  const showcased = projects.filter((p) => p.showcase).sort((a, b) => Number(b.showcase === 'flagship') - Number(a.showcase === 'flagship') || a.order - b.order)
+  showcased.forEach((p, i) => (p.slot = i + 1))
+  const flagships = showcased.filter((p) => p.showcase === 'flagship')
+  const moreBuilds = showcased.filter((p) => p.showcase === 'build')
+
   const firstName = raw.name.split(/\s+/)[0] ?? raw.name
   const achievements = (raw.marathon?.medals ?? []).map((m) => ({
     title: `${m.distance} · ${m.event}`,
     detail: m.medal ?? 'Finisher',
   }))
   const role = raw.label ?? ''
+  const status = raw.status ?? config.defaultStatus
+
+  // "whoami" card rows: name, role, builds, stack, principle, studying, status.
+  const m = raw.manifest ?? {}
+  const edu = education[0]
+  const manifest = [
+    ['name', raw.name],
+    ['role', m.role ?? role.split('|')[0].trim()],
+    ['builds', m.builds],
+    ['stack', m.stack],
+    ['principle', m.principle],
+    ['studying', edu ? `${edu.title.replace(/\s+in\s+/i, ' ')} @ ${edu.org}` : undefined],
+    ['status', status],
+  ]
+    .filter(([, value]) => value)
+    .map(([key, value]) => ({ key, value }))
 
   return {
     name: raw.name,
@@ -217,7 +258,13 @@ export function normalize(raw) {
     /** First part of the label, e.g. "AI Engineer". */
     primaryRole: role.split('|')[0].trim(),
     tagline: raw.tagline ?? role,
-    status: raw.status ?? config.defaultStatus,
+    status,
+    /** Shown under the name, e.g. "AI ENGINEER / AGENTS / RAG / MCP". */
+    subtitle: raw.subtitle ?? role.split('|')[0].trim(),
+    /** Lines the hero types out, one after another. */
+    taglines: (raw.taglines ?? []).filter(Boolean).length ? raw.taglines.filter(Boolean) : [raw.tagline ?? role],
+    manifest,
+    certifications: (raw.certifications ?? []).filter((c) => c?.name).map((c) => ({ name: c.name, issuer: c.issuer || undefined })),
     summary: raw.summary,
     image: raw.image_path,
     location: raw.contact?.location || undefined,
@@ -230,6 +277,8 @@ export function normalize(raw) {
     github: socials.find((s) => s.key === 'github'),
     linkedin: socials.find((s) => s.key === 'linkedin'),
     projects,
+    flagships,
+    moreBuilds,
     skills,
     skillGroups,
     techTags,

@@ -11,7 +11,8 @@
  *
  * A provider is any object with `ask(question) -> Promise<{ text, sources, evidence?, via }>`.
  */
-import { aboutMd, contactTxt, interestsMd, projectMd, skillsTxt, timelineMd } from '../data/text.js'
+import { graphSummary } from '../data/graph.js'
+import { aboutMd, certificationsMd, contactTxt, interestsMd, projectMd, skillsTxt, timelineMd } from '../data/text.js'
 
 const STOP = new Set(
   'a an the is are was were do does did can could what which who whom how why when where of to in on for with and or his her their your you he she it this that about tell me any has have had i my vaibhav barman'.split(' '),
@@ -49,6 +50,13 @@ function buildDocs(d) {
       text: timelineMd(d, 'education'),
       answer: timelineMd(d, 'education').replace(/^## /gm, '').replace(/\n- /g, ', ').replace(/\n/g, '. '),
       boost: ['education', 'study', 'degree', 'university', 'college', 'gpa', 'cgpa', 'bits', 'graduate', 'graduation'],
+    },
+    {
+      id: 'certifications.md',
+      title: 'Certifications',
+      text: certificationsMd(d),
+      answer: d.certifications.length ? `Certifications: ${d.certifications.map((c) => c.name + (c.issuer ? ` (${c.issuer})` : '')).join('; ')}.` : 'No certifications are listed.',
+      boost: ['certification', 'certifications', 'certificate', 'certificates', 'certified', 'course', 'courses', 'bootcamp', 'training'],
     },
     {
       id: 'experience.md',
@@ -142,7 +150,7 @@ export function buildChunks(d) {
   const chunks = docs.map((doc) => ({ docId: doc.id, text: `${doc.title}. ${doc.answer}` }))
   for (const p of d.projects) {
     for (const h of p.highlights) chunks.push({ docId: `projects/${p.slug}.md`, text: `${p.title}: ${h}`, evidence: h })
-    if (p.pipeline) chunks.push({ docId: `projects/${p.slug}.md`, text: `${p.title} works like this: ${p.pipeline.nodes.join(', then ')}.` })
+    for (const r of graphSummary(p.graph)) chunks.push({ docId: `projects/${p.slug}.md`, text: `${p.title} (${r.name}) works like this: ${r.steps.join(', then ')}.` })
   }
   for (const g of d.skillGroups) chunks.push({ docId: 'skills.txt', text: `${g.name}: ${g.skills.map((s) => s.name).join(', ')}`, evidence: `${g.name}: ${g.skills.map((s) => s.name).join(', ')}` })
   for (const f of d.focusAreas ?? []) chunks.push({ docId: 'interests.md', text: `Focus area: ${f.name}. ${f.summary ?? ''}` })

@@ -6,10 +6,10 @@ export const whoami = {
   summary: 'who is this?',
   group: 'info',
   run: (_, { data: d }) => [
-    [t(d.name, 'bold'), t(` · ${d.primaryRole}`, 'accent')],
-    [t(d.tagline)],
-    [t('status: ', 'muted'), t(d.status, 'ok')],
-    [t('next:   ', 'muted'), run('projects'), t(' · ', 'dim'), run('skills'), t(' · ', 'dim'), run('neofetch'), t(' · ', 'dim'), run('help')],
+    ...d.manifest.map((r) => [t(pad(r.key.toUpperCase(), 11), 'muted'), t(r.value, r.key === 'name' ? 'bold' : r.key === 'status' ? 'ok' : undefined)]),
+    [t('IDENTITY.LOAD() · OK', 'dim')],
+    blank,
+    [t('next: ', 'muted'), run('projects'), t(' · ', 'dim'), run('skills'), t(' · ', 'dim'), run('neofetch'), t(' · ', 'dim'), run('help')],
   ],
 }
 
@@ -58,7 +58,6 @@ export const neofetch = {
       [t('Status   ', 'heading'), t(d.status, 'ok')],
       [t('Stack    ', 'heading'), t(d.skills.slice(0, 5).map((s) => s.name).join(', '))],
       [t('Projects ', 'heading'), t(`${d.projects.length} (${featured} featured)`)],
-      [t('Theme    ', 'heading'), t(actions.getTheme())],
       [
         t('Links    ', 'heading'),
         ...d.socials.filter((s) => s.key !== 'website').flatMap((s, i) => [...(i ? [t(' · ', 'dim')] : []), link(s.label, s.url)]),
@@ -140,9 +139,15 @@ export const experience = {
 
 export const education = {
   name: 'education',
-  summary: 'education',
+  aliases: ['certs', 'certifications'],
+  summary: 'education and certifications',
   group: 'info',
-  run: timeline('education'),
+  run: (args, ctx) => {
+    const out = timeline('education')(args, ctx)
+    const certs = ctx.data.certifications
+    if (!certs.length) return out
+    return [...out, heading('certifications'), ...certs.map((c) => [t('▸ ', 'accent'), t(c.name), ...(c.issuer ? [t(` (${c.issuer})`, 'muted')] : [])])]
+  },
 }
 
 export const contact = {
