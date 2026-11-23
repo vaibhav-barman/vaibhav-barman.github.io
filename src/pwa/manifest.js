@@ -7,6 +7,14 @@ import { theme } from '../theme.js'
 
 export const APP_NAME = 'Vaibhav Barman'
 export const APP_SHORT_NAME = 'vaibhav.sh'
+export const APP_DESCRIPTION = 'Vaibhav Barman: AI engineer building agents, RAG and MCP systems. Open to remote AI engineering roles.'
+
+/** Long-press / right-click jump points on the installed app's icon. `href` is relative to the base. */
+export const SHORTCUTS = [
+  { name: 'Flagship builds', short_name: 'Builds', description: 'The three agent pipelines', href: '#projects' },
+  { name: 'Resume', short_name: 'Resume', description: 'Printable resume', href: 'resume.html' },
+  { name: 'Contact', short_name: 'Contact', description: 'Email, GitHub and LinkedIn', href: '#contact' },
+]
 
 /** Icon files in public/ (made by `npm run icons`). */
 export const ICONS = [
@@ -22,6 +30,10 @@ export function webManifest(base = '/') {
     id: base,
     name: APP_NAME,
     short_name: APP_SHORT_NAME,
+    description: APP_DESCRIPTION,
+    lang: 'en',
+    dir: 'ltr',
+    categories: ['portfolio', 'developer', 'technology'],
     start_url: base,
     scope: base,
     display: 'standalone',
@@ -29,6 +41,7 @@ export function webManifest(base = '/') {
     background_color: theme.background,
     theme_color: theme.background,
     icons: ICONS.map((i) => ({ ...i, src: base + i.src })),
+    shortcuts: SHORTCUTS.map(({ href, ...s }) => ({ ...s, url: base + href, icons: [{ src: base + ICONS[0].src, sizes: '192x192', type: 'image/png' }] })),
   }
 }
 
