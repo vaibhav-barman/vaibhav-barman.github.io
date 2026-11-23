@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { theme } from '../src/theme.js'
+import { appIconSvg, cssVariables, faviconSvg, theme } from '../src/theme.js'
 
 // WCAG 2.x relative luminance / contrast ratio
 const lum = (hex) => {
@@ -15,25 +15,70 @@ const contrast = (a, b) => {
   return (x + 0.05) / (y + 0.05)
 }
 
-describe('theme', () => {
-  it('uses a single accent colour', () => {
-    expect(theme.accent).toMatch(/^#[0-9a-f]{6}$/i)
-    expect(theme.presets.blue).toBe('#3b82f6')
-    expect(theme.secondary).toMatch(/^#[0-9a-f]{6}$/i)
-    expect(theme.secondary.toLowerCase()).not.toBe(theme.accent.toLowerCase())
+const GREYS = ['background', 'surface', 'line', 'line2', 'lineHi', 'crop', 'dim', 'mid', 'text', 'white']
+
+describe('theme tokens', () => {
+  it('are exactly the profile README design tokens', () => {
+    expect(theme).toMatchObject({
+      background: '#000000',
+      surface: '#050505',
+      line: '#1a1a1a',
+      line2: '#2a2a2a',
+      dim: '#6b6b6b',
+      mid: '#a3a3a3',
+      text: '#ededed',
+      white: '#ffffff',
+    })
   })
 
-  it('keeps every text colour at WCAG AA (4.5:1) or better', () => {
+  it('are all pure greys (r = g = b)', () => {
+    for (const k of GREYS) {
+      const [r, g, b] = theme[k].replace('#', '').match(/../g)
+      expect(r === g && g === b, `${k} ${theme[k]}`).toBe(true)
+    }
+  })
+
+  it('has no accent, secondary, error or presets', () => {
+    for (const k of ['accent', 'secondary', 'error', 'presets', 'muted']) expect(theme[k]).toBeUndefined()
+  })
+
+  it('keeps readable text at WCAG AA (4.5:1) on the background and on panels', () => {
     for (const bg of [theme.background, theme.surface]) {
       expect(contrast(theme.text, bg)).toBeGreaterThanOrEqual(4.5)
-      expect(contrast(theme.muted, bg)).toBeGreaterThanOrEqual(4.5)
-      expect(contrast(theme.error, bg)).toBeGreaterThanOrEqual(4.5)
-      expect(contrast(theme.secondary, bg), `secondary on ${bg}`).toBeGreaterThanOrEqual(4.5)
-      for (const accent of [theme.accent, ...Object.values(theme.presets)]) {
-        expect(contrast(accent, bg), `${accent} on ${bg}`).toBeGreaterThanOrEqual(4.5)
-        // dark text on accent buttons
-        expect(contrast(theme.background, accent)).toBeGreaterThanOrEqual(4.5)
-      }
+      expect(contrast(theme.mid, bg)).toBeGreaterThanOrEqual(4.5)
+      expect(contrast(theme.white, bg)).toBeGreaterThanOrEqual(4.5)
+    }
+  })
+
+  it('keeps dim text decorative: at least 3:1 (UI/large) but documented as below AA for small text', () => {
+    expect(contrast(theme.dim, theme.background)).toBeGreaterThanOrEqual(3)
+    expect(contrast(theme.dim, theme.background)).toBeLessThan(4.5)
+  })
+
+  it('uses the reference chrome gradient', () => {
+    expect(theme.chrome).toBe('linear-gradient(100deg, #6f6f6f 0%, #ffffff 22%, #9c9c9c 45%, #f2f2f2 62%, #6a6a6a 80%, #d9d9d9 100%)')
+  })
+
+  it('uses Helvetica Neue / Inter / system sans and a system mono stack', () => {
+    expect(theme.fonts.sans.startsWith("'Helvetica Neue'")).toBe(true)
+    expect(theme.fonts.sans).toContain('Inter')
+    expect(theme.fonts.mono.startsWith('ui-monospace')).toBe(true)
+    expect(theme.fonts.mono).toContain('Menlo')
+  })
+
+  it('emits every token as a CSS variable', () => {
+    const vars = cssVariables()
+    for (const v of ['--bg', '--panel', '--line', '--line2', '--dim', '--mid', '--text', '--white', '--chrome', '--font-sans', '--font-mono']) {
+      expect(vars).toContain(v + ':')
+    }
+    expect(vars).not.toContain('--accent')
+  })
+
+  it('draws the favicon and app icon as a chrome ball on black', () => {
+    for (const svg of [faviconSvg(), appIconSvg(1.4)]) {
+      expect(svg).toContain('<circle')
+      expect(svg).toContain('fill="#000000"')
+      expect(svg).toContain('linearGradient')
     }
   })
 })

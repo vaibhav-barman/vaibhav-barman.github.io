@@ -2,9 +2,20 @@
  * Plain-text / Markdown renderings of the portfolio. Shared by the terminal's
  * virtual filesystem (`cat`), the `resume --md` download and `ask`.
  */
+import { graphSummary } from './graph.js'
 
 export function aboutMd(d) {
-  const lines = [`# ${d.name}`, `> ${d.role}`, '', d.summary, '', ...(d.location ? [`Location: ${d.location}`] : []), `Status:   ${d.status}`]
+  const principle = d.manifest.find((r) => r.key === 'principle')?.value
+  const lines = [
+    `# ${d.name}`,
+    `> ${d.role}`,
+    '',
+    d.summary,
+    '',
+    ...(principle ? [`Principle: ${principle}`] : []),
+    ...(d.location ? [`Location: ${d.location}`] : []),
+    `Status:   ${d.status}`,
+  ]
   if (d.languages.length) lines.push(`Speaks:   ${d.languages.map((l) => `${l.language} (${l.fluency})`).join(', ')}`)
   return lines.join('\n')
 }
@@ -17,7 +28,7 @@ export function projectMd(p) {
     p.summary,
     '',
     ...(p.facts.length ? [p.facts.map((f) => `${f.value} ${f.label}`).join(' · '), ''] : []),
-    ...(p.pipeline ? [`How it works: ${p.pipeline.nodes.join(' → ')}${p.pipeline.loop ? ` (loops ${p.pipeline.nodes[p.pipeline.loop.from]} → ${p.pipeline.nodes[p.pipeline.loop.to]}: ${p.pipeline.loop.label})` : ''}`, ''] : []),
+    ...(p.graph ? ['How it works:', ...graphSummary(p.graph).map((r) => `- ${r.name}: ${r.steps.join(' → ')}`), ''] : []),
     ...(p.highlights.length ? ['## Highlights', ...p.highlights.map((h) => `- ${h}`), ''] : []),
     ...(p.tags.length ? [`Stack: ${p.tags.join(', ')}`] : []),
     ...(p.repoUrl ? [`Repo:  ${p.repoUrl}`] : []),
@@ -43,6 +54,11 @@ export function timelineMd(d, kind) {
         .join('\n'),
     )
     .join('\n\n')
+}
+
+export function certificationsMd(d) {
+  if (!d.certifications.length) return 'No certifications listed.'
+  return d.certifications.map((c) => `- ${c.name}${c.issuer ? ` (${c.issuer})` : ''}`).join('\n')
 }
 
 export function contactTxt(d) {
@@ -79,6 +95,9 @@ export function resumeMd(d) {
     '',
     '# Education',
     timelineMd(d, 'education'),
+    '',
+    '# Certifications',
+    certificationsMd(d),
     '',
     '# Interests',
     interestsMd(d),

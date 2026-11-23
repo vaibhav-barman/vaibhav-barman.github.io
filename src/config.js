@@ -1,5 +1,5 @@
 /**
- * Site behaviour and 3D tuning. Colours live in theme.js; every word of
+ * Site behaviour and UI copy. Colours live in theme.js; every word of
  * content lives in /portfolio.json.
  */
 export const config = {
@@ -16,50 +16,43 @@ export const config = {
   },
 
   /**
-   * Page sections, in order. `label` is the nav text; eyebrow/title/lead are
-   * the section heading copy. `stage` adds a framed 3D window next to the heading.
+   * Page sections, in order. `label` is the nav text; `head`, `note` and `lead`
+   * are the section heading copy. `{flagships}` / `{builds}` in a note become
+   * the counts from portfolio.json. Sections are numbered 01, 02, ... in this
+   * order (the hero is not numbered).
    */
   sections: [
-    { id: 'hero', label: 'home', eyebrow: '', title: '' },
-    { id: 'about', label: 'about', eyebrow: 'about.md', title: 'Building AI that ships.' },
+    { id: 'hero', label: 'home', head: '' },
+    { id: 'about', label: 'whoami', head: 'whoami', note: 'identity.load()' },
     {
       id: 'projects',
-      label: 'projects',
-      eyebrow: '~/projects',
-      title: "Things I've built.",
-      lead: 'Agentic and AI-first work first. Hover a featured project to see how it works.',
-      stage: 'fig.01 · how it works',
+      label: 'builds',
+      head: 'flagship builds',
+      note: '{flagships} agentic pipelines',
+      lead: 'The panels animate the real graphs: each white packet is one run taking a different route through the nodes.',
     },
-    {
-      id: 'skills',
-      label: 'skills',
-      eyebrow: 'skills.txt',
-      title: 'The stack.',
-      lead: 'Grouped by category. Hover a skill to see which projects use it.',
-      stage: 'fig.02 · skill graph',
-    },
-    {
-      id: 'journey',
-      label: 'journey',
-      eyebrow: 'experience.md · education.md',
-      title: 'The path so far.',
-      /** Shown as the last timeline step while work_experience is empty. */
-      next: 'Your team?',
-    },
+    { id: 'builds', label: 'more', head: 'more builds', note: '{builds} more shipped projects' },
+    { id: 'skills', label: 'stack', head: 'stack', note: 'what I build with' },
+    { id: 'journey', label: 'credentials', head: 'experience & credentials', note: 'training.log' },
     {
       id: 'notes',
       label: 'notes',
-      eyebrow: '~/notes',
-      title: 'Notes.',
+      head: 'notes',
+      note: 'lab notebook',
       lead: 'Short write-ups on how I build and evaluate AI systems.',
       /** Only shown (with its nav link) when notes/ has published notes. */
       optional: true,
     },
-    { id: 'contact', label: 'contact', eyebrow: 'contact.txt', title: "Let's build something." },
+    { id: 'contact', label: 'contact', head: 'open a channel', note: 'handshake()' },
   ],
 
   /** Call-to-action button on the right of the nav bar. */
   nav: { cta: { label: 'Get in touch', href: '#contact' } },
+
+  /** The terminal-style card in the whoami section. */
+  whoami: { command: 'whoami --verbose', done: 'IDENTITY.LOAD() · OK', shell: '› open shell', shellClose: '× close shell' },
+
+  footer: { end: 'END OF TRANSMISSION' },
 
   terminal: {
     /** Prompt template. {user} defaults to the first name from the JSON. */
@@ -77,7 +70,7 @@ export const config = {
     bootText: [
       '[ OK ] mounting /home/{user} from portfolio.json',
       '[ OK ] loading {projects} projects, {skills} skills',
-      '[ OK ] neural field online',
+      '[ OK ] chrome core online',
     ],
     /** Tappable chips under the terminal. */
     chips: ['whoami', 'projects', 'skills', 'contact'],
@@ -86,25 +79,4 @@ export const config = {
 
   /** Fallback when portfolio.json has no "status". */
   defaultStatus: 'open to opportunities',
-
-  scene: {
-    /** Neural-network nodes (instanced, one draw call). */
-    nodes: { desktop: 220, mobile: 90 },
-    /** Max links per node and max link length. */
-    linksPerNode: 3,
-    linkDistance: 2.6,
-    /** Device-pixel-ratio cap; keeps fill-rate sane on retina screens. */
-    maxDpr: { desktop: 1.5, mobile: 1.25 },
-    /** How strongly nodes are pushed away from / lit by the mouse. */
-    mouse: { radius: 2.4, push: 0.55 },
-    bloom: { strength: 0.9, radius: 0.35, threshold: 0.38 },
-    /** Camera follow speed when scrolling (higher = snappier). */
-    cameraEase: 3.2,
-    /** Mouse parallax strength (world units). */
-    parallax: 0.45,
-    /** Scrolling top→bottom flies the camera this far forward (z), down (y) and side to side. */
-    travel: { depth: 80, drop: 2.5, sway: 1.2 },
-    /** Camera position relative to the point it looks at. */
-    cameraOffset: [0, 0.6, 9],
-  },
 }

@@ -11,8 +11,6 @@ const data = normalize(raw)
 function makeCtx(overrides = {}) {
   let cwd = '~'
   const actions = {
-    setTheme: vi.fn(),
-    getTheme: () => 'green',
     set3D: vi.fn(),
     get3D: () => ({ enabled: true, available: true }),
     goTo: vi.fn(),
@@ -62,9 +60,14 @@ describe('engine', () => {
   })
 
   it('has all the classic commands', () => {
-    for (const name of ['help', 'whoami', 'neofetch', 'projects', 'skills', 'experience', 'education', 'contact', 'resume', 'ls', 'cd', 'cat', 'theme', 'sudo', 'history', 'clear']) {
+    for (const name of ['help', 'whoami', 'neofetch', 'projects', 'skills', 'experience', 'education', 'contact', 'resume', 'ls', 'cd', 'cat', 'sudo', 'history', 'clear']) {
       expect(registry.get(name), name).toBeDefined()
     }
+  })
+
+  it('has no theme command: the site is black, white and chrome, with no accent to switch', async () => {
+    expect(registry.get('theme')).toBeUndefined()
+    expect(text(await execute('theme blue', makeCtx()))).toMatch(/not found|unknown/i)
   })
 
   it('identifies social links by host, not substrings', () => {
@@ -75,6 +78,24 @@ describe('engine', () => {
   it('whoami and neofetch use JSON content', async () => {
     expect(text(await execute('whoami', makeCtx()))).toContain(data.name)
     expect(text(await execute('neofetch', makeCtx()))).toContain(data.status)
+  })
+
+  it('whoami prints the same manifest as the page, principle included', async () => {
+    const out = text(await execute('whoami', makeCtx()))
+    for (const r of data.manifest) expect(out).toContain(r.value)
+    expect(out).toContain('checks over model opinion')
+    expect(out).toContain('IDENTITY.LOAD() · OK')
+  })
+
+  it('education also lists the certifications', async () => {
+    const out = text(await execute('education', makeCtx()))
+    expect(out).toContain('BITS Pilani')
+    for (const c of data.certifications) expect(out).toContain(c.name)
+  })
+
+  it('error output carries a glyph, not a colour (the palette has no red)', async () => {
+    const out = await execute('definitely-not-a-command', makeCtx())
+    expect(JSON.stringify(out)).toContain('"tone":"error"')
   })
 
   it('skills prints every skill and no percentages', async () => {
@@ -101,13 +122,6 @@ describe('engine', () => {
     expect(text(await execute('open gitcomit-ai', makeCtx()))).toContain('did you mean')
   })
 
-  it('theme validates names', async () => {
-    const ctx = makeCtx()
-    await execute('theme blue', ctx)
-    expect(ctx.actions.setTheme).toHaveBeenCalledWith('blue')
-    expect(text(await execute('theme pink', ctx))).toContain('unknown theme')
-  })
-
   it('virtual filesystem: ls, cd, cat', async () => {
     const ctx = makeCtx()
     expect(text(await execute('ls', ctx))).toContain('projects/')
@@ -122,7 +136,7 @@ describe('engine', () => {
   it('completes command names and arguments', () => {
     const ctx = makeCtx()
     expect(complete('neo', ctx).value).toBe('neofetch ')
-    expect(complete('theme bl', ctx).value).toBe('theme blue ')
+    expect(complete('3d of', ctx).value).toBe('3d off ')
     expect(complete('cat proj', ctx).value).toBe('cat projects/')
     expect(complete('s', ctx).options).toEqual(expect.arrayContaining(['skills', 'sudo']))
   })

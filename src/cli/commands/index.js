@@ -9,7 +9,7 @@ import { cat, cd, ls, pwd } from './fs.js'
 import { rm, sudo, vim } from './fun.js'
 import { about, contact, education, experience, neofetch, skills, whoami } from './info.js'
 import { open, projects } from './projects.js'
-import { ask, clear, echo, exit, github, help, history, linkedin, resume, theme, threeD } from './system.js'
+import { ask, clear, echo, exit, github, help, history, linkedin, resume, threeD } from './system.js'
 
 export const registry = createRegistry([
   // about me
@@ -33,7 +33,6 @@ export const registry = createRegistry([
   cd,
   cat,
   pwd,
-  theme,
   threeD,
   history,
   clear,

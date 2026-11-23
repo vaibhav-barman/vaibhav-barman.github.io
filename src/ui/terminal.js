@@ -12,7 +12,6 @@ import { inputLineHtml, linesHtml, promptHtml, promptText } from '../cli/render.
 import { VFS } from '../cli/vfs.js'
 import { config } from '../config.js'
 import { portfolio as d } from '../data/portfolio.js'
-import { theme } from '../theme.js'
 import { bus, state } from './bus.js'
 
 const coarse = () => matchMedia('(pointer: coarse)').matches
@@ -69,19 +68,7 @@ export function initTerminal() {
     if (title) title.textContent = promptText(cwd, d.handle).replace(/\$$/, '')
   }
 
-  const currentTheme = () => {
-    const accent = state.accent ?? theme.accent
-    return Object.entries(theme.presets).find(([, v]) => v.toLowerCase() === accent.toLowerCase())?.[0] ?? accent
-  }
-
   const actions = {
-    setTheme(name) {
-      const color = name ? theme.presets[name] : theme.accent
-      state.accent = name ? color : null
-      document.documentElement.style.setProperty('--accent', color)
-      bus.emit('accent', color)
-    },
-    getTheme: currentTheme,
     set3D(on) {
       bus.emit('3d', on)
     },
@@ -130,7 +117,6 @@ export function initTerminal() {
     if (history.length > config.terminal.maxHistory) history.shift()
     histIdx = null
     jumpTo = null
-    // The 3D network sends a signal out from the terminal on every command.
     bus.emit('command', cmd)
     // Slow commands (the first `ask` loads a model) show a status line until they finish.
     const def = registry.get(tokenize(cmd)[0] ?? '')

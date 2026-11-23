@@ -2,7 +2,21 @@
   "name": "Vaibhav Barman",
   "label": "AI Engineer | LLM Applications, RAG & AI Agents",
   "tagline": "I build AI agents that check their own work: LLM apps, RAG pipelines and multi-agent systems, often on local models.",
-  "status": "open to remote roles",
+  "subtitle": "AI ENGINEER / AGENTS / RAG / MCP",
+  "taglines": [
+    "building agents that check their own work",
+    "self-rag · corrective-rag · multi-agent writers",
+    "langgraph state machines with bounded retries",
+    "local models via ollama, frontier models via api",
+    "deterministic checks > model opinion"
+  ],
+  "manifest": {
+    "role": "AI Engineer · agentic systems",
+    "builds": "self-correcting RAG · multi-agent pipelines · MCP servers",
+    "stack": "LangGraph · LangChain · FastMCP · Ollama · FastAPI · Postgres",
+    "principle": "checks over model opinion"
+  },
+  "status": "open to remote AI engineering roles",
   "image_path": "img/profile.jpg",
   "contact": {
     "email": "vaibhavbarman2609@gmail.com",
@@ -11,7 +25,7 @@
     "website": "https://vaibhav-barman.github.io",
     "booking_url": ""
   },
-  "summary": "AI engineer building LLM applications, RAG pipelines and multi-agent systems in Python, with a focus on local models, structured outputs and evaluation. I study Computer Science at BITS Pilani (B.Sc., expected 2027) and learn by shipping: ten open-source projects since August 2026.",
+  "summary": "AI engineer building LLM applications, RAG pipelines and multi-agent systems in Python, with a focus on local models, structured outputs and evaluation. I study Computer Science at BITS Pilani (B.S., expected 2027) and learn by shipping open-source projects since August 2026.",
   "base_url": "https://vaibhav-barman.github.io",
   "social_links": [
     {
@@ -30,13 +44,732 @@
       "svg_path": "img/github.svg"
     }
   ],
-  "work_experience": [],
+  "work_experience": [
+    {
+      "position": "AI/ML Intern",
+      "company": "Elevate Labs"
+    }
+  ],
   "projects": [
+    {
+      "title": "Blog Writing Agent",
+      "summary": "A LangGraph agent that writes a blog post from a topic: it decides whether the topic needs fresh web facts, plans the post, and writes every section in parallel.",
+      "url": "https://github.com/vaibhav-barman/blog-wriring-agent",
+      "featured": true,
+      "showcase": "flagship",
+      "category": "agentic",
+      "tags": [
+        "LangGraph",
+        "LangChain",
+        "Gemini",
+        "Tavily",
+        "Pydantic",
+        "Streamlit"
+      ],
+      "highlights": [
+        "Fans out with LangGraph Send: one worker per planned section (4 to 6), merged back by an operator.add reducer.",
+        "No invented links: any Markdown link whose URL is not in the supplied evidence is turned back into plain text.",
+        "Honest about thin research: with fewer than 3 distinct sources, the post opens with a note saying so.",
+        "Quota-aware: every call goes through one cached, rate-limited path with backoff and an outage breaker."
+      ],
+      "images": [],
+      "facts": [
+        {
+          "value": "4–6",
+          "label": "sections written in parallel"
+        },
+        {
+          "value": "5–8",
+          "label": "LLM calls per post"
+        },
+        {
+          "value": "~2 min",
+          "label": "to write a post"
+        }
+      ],
+      "graph": {
+        "nodes": [
+          {
+            "id": "start",
+            "label": "START",
+            "kind": "ring",
+            "wide": [2, 60],
+            "tall": [50, 2],
+            "tallLabel": "right",
+            "wideLabel": "below"
+          },
+          {
+            "id": "router",
+            "label": "router",
+            "sub": "picks a mode",
+            "kind": "ball",
+            "wide": [16, 60],
+            "tall": [50, 12],
+            "tallLabel": "right",
+            "wideLabel": "below"
+          },
+          {
+            "id": "research",
+            "label": "research",
+            "sub": "Tavily, optional",
+            "kind": "ring",
+            "wide": [33, 22],
+            "tall": [14, 27],
+            "tallLabel": "below",
+            "wideLabel": "above"
+          },
+          {
+            "id": "orchestrator",
+            "label": "orchestrator",
+            "sub": "plans 4–6 sections",
+            "kind": "ball",
+            "wide": [49, 60],
+            "tall": [50, 42],
+            "tallLabel": "right",
+            "wideLabel": "below"
+          },
+          {
+            "id": "worker1",
+            "label": "worker 1",
+            "sub": "section 1",
+            "kind": "ring",
+            "wide": [65, 34],
+            "tall": [20, 58],
+            "wideLabel": "right",
+            "tallLabel": "below"
+          },
+          {
+            "id": "worker2",
+            "label": "worker 2",
+            "sub": "section 2",
+            "kind": "ring",
+            "wide": [65, 60],
+            "tall": [50, 58],
+            "wideLabel": "right",
+            "tallLabel": "below"
+          },
+          {
+            "id": "workerN",
+            "label": "worker N",
+            "sub": "section N",
+            "kind": "ring",
+            "wide": [65, 86],
+            "tall": [80, 58],
+            "wideLabel": "right",
+            "tallLabel": "below"
+          },
+          {
+            "id": "images",
+            "label": "images",
+            "sub": "optional",
+            "kind": "ring",
+            "wide": [79, 60],
+            "tall": [50, 73],
+            "tallLabel": "right",
+            "wideLabel": "below"
+          },
+          {
+            "id": "reducer",
+            "label": "reducer",
+            "sub": "order · cite · save",
+            "kind": "ball",
+            "wide": [91, 60],
+            "tall": [50, 87],
+            "tallLabel": "right",
+            "wideLabel": "above"
+          },
+          {
+            "id": "end",
+            "label": "END",
+            "kind": "ring",
+            "wide": [100, 60],
+            "tall": [50, 98],
+            "tallLabel": "right",
+            "wideLabel": "below"
+          }
+        ],
+        "edges": [
+          {
+            "from": "start",
+            "to": "router"
+          },
+          {
+            "from": "router",
+            "to": "research",
+            "label": "hybrid / open_book",
+            "conditional": true
+          },
+          {
+            "from": "router",
+            "to": "orchestrator",
+            "label": "closed_book",
+            "conditional": true,
+            "tallLabel": "closed_book"
+          },
+          {
+            "from": "research",
+            "to": "orchestrator"
+          },
+          {
+            "from": "orchestrator",
+            "to": "worker1",
+            "conditional": true
+          },
+          {
+            "from": "orchestrator",
+            "to": "worker2",
+            "label": "Send per section",
+            "conditional": true,
+            "tallLabel": "Send"
+          },
+          {
+            "from": "orchestrator",
+            "to": "workerN",
+            "conditional": true
+          },
+          {
+            "from": "worker1",
+            "to": "images"
+          },
+          {
+            "from": "worker2",
+            "to": "images"
+          },
+          {
+            "from": "workerN",
+            "to": "images"
+          },
+          {
+            "from": "images",
+            "to": "reducer"
+          },
+          {
+            "from": "reducer",
+            "to": "end"
+          }
+        ],
+        "routes": [
+          {
+            "name": "closed book",
+            "path": [
+              "start",
+              "router",
+              "orchestrator",
+              "worker1",
+              "images",
+              "reducer",
+              "end"
+            ]
+          },
+          {
+            "name": "with research",
+            "path": [
+              "start",
+              "router",
+              "research",
+              "orchestrator",
+              "worker2",
+              "images",
+              "reducer",
+              "end"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "title": "Self-RAG",
+      "summary": "RAG that decides whether to retrieve, grades what it finds, checks its own answer, and retries when it is weak.",
+      "url": "https://github.com/vaibhav-barman/self-rag",
+      "featured": true,
+      "showcase": "flagship",
+      "category": "rag",
+      "tags": [
+        "LangGraph",
+        "LangChain",
+        "Groq",
+        "Ollama",
+        "ChromaDB",
+        "Pydantic",
+        "Streamlit"
+      ],
+      "highlights": [
+        "Four reflection checks, each a Pydantic schema through Groq structured output: retrieve, ISREL (relevance), ISSUP (support) and ISUSE (usefulness).",
+        "Bounded loops: at most 2 revisions and 2 rewrites, so the graph always terminates.",
+        "Honest fallback: returns the best answer found with a \"limited context\" note, or says it could not find it in the documents.",
+        "Each call tries the primary Groq model first, then a fallback model."
+      ],
+      "images": [],
+      "facts": [
+        {
+          "value": "11",
+          "label": "graph nodes"
+        },
+        {
+          "value": "4",
+          "label": "reflection checks"
+        },
+        {
+          "value": "≤ 2",
+          "label": "revision rounds and rewrites"
+        }
+      ],
+      "graph": {
+        "nodes": [
+          {
+            "id": "decide",
+            "label": "decide retrieval",
+            "sub": "retrieve? yes / no",
+            "kind": "ball",
+            "wide": [3, 54],
+            "tall": [48, 1],
+            "tallLabel": "right",
+            "wideLabel": "below"
+          },
+          {
+            "id": "direct",
+            "label": "answer directly",
+            "sub": "skips retrieval",
+            "kind": "ring",
+            "wide": [52, 10],
+            "tall": [15, 13],
+            "tallLabel": "below",
+            "wideLabel": "above"
+          },
+          {
+            "id": "retrieve",
+            "label": "retrieve",
+            "sub": "top-4 chunks",
+            "kind": "ring",
+            "wide": [20, 54],
+            "tall": [48, 13],
+            "tallLabel": "right",
+            "wideLabel": "below"
+          },
+          {
+            "id": "isrel",
+            "label": "ISREL",
+            "sub": "relevant?",
+            "kind": "ball",
+            "wide": [37, 54],
+            "tall": [48, 25],
+            "tallLabel": "right",
+            "wideLabel": "below"
+          },
+          {
+            "id": "generate",
+            "label": "generate",
+            "sub": "per relevant chunk",
+            "kind": "ring",
+            "wide": [54, 54],
+            "tall": [48, 37],
+            "tallLabel": "right",
+            "wideLabel": "below"
+          },
+          {
+            "id": "issup",
+            "label": "ISSUP",
+            "sub": "grounded?",
+            "kind": "ball",
+            "wide": [71, 54],
+            "tall": [48, 49],
+            "tallLabel": "right",
+            "wideLabel": "below"
+          },
+          {
+            "id": "revise",
+            "label": "revise",
+            "sub": "≤ 2 rounds",
+            "kind": "ring",
+            "wide": [71, 92],
+            "tall": [15, 56],
+            "tallLabel": "below",
+            "wideLabel": "below"
+          },
+          {
+            "id": "isuse",
+            "label": "ISUSE",
+            "sub": "useful?",
+            "kind": "ball",
+            "wide": [88, 54],
+            "tall": [48, 66],
+            "tallLabel": "right",
+            "wideLabel": "below"
+          },
+          {
+            "id": "rewrite",
+            "label": "rewrite",
+            "sub": "≤ 2 retries",
+            "kind": "ring",
+            "wide": [28, 10],
+            "tall": [15, 31],
+            "tallLabel": "below",
+            "wideLabel": "above"
+          },
+          {
+            "id": "limited",
+            "label": "limited context",
+            "sub": "honest fallback",
+            "kind": "ring",
+            "wide": [52, 92],
+            "tall": [15, 82],
+            "tallLabel": "below",
+            "wideLabel": "below"
+          },
+          {
+            "id": "end",
+            "label": "ANSWER",
+            "kind": "ring",
+            "wide": [100, 54],
+            "tall": [48, 98],
+            "tallLabel": "right",
+            "wideLabel": "above"
+          }
+        ],
+        "edges": [
+          {
+            "from": "decide",
+            "to": "direct",
+            "conditional": true
+          },
+          {
+            "from": "decide",
+            "to": "retrieve",
+            "conditional": true
+          },
+          {
+            "from": "direct",
+            "to": "isuse"
+          },
+          {
+            "from": "retrieve",
+            "to": "isrel"
+          },
+          {
+            "from": "isrel",
+            "to": "generate",
+            "label": "relevant",
+            "conditional": true
+          },
+          {
+            "from": "isrel",
+            "to": "rewrite",
+            "conditional": true,
+            "label": "none relevant"
+          },
+          {
+            "from": "isrel",
+            "to": "limited",
+            "conditional": true
+          },
+          {
+            "from": "generate",
+            "to": "issup"
+          },
+          {
+            "from": "issup",
+            "to": "revise",
+            "label": "not grounded",
+            "conditional": true,
+            "bend": 0.22
+          },
+          {
+            "from": "revise",
+            "to": "issup",
+            "bend": 0.22
+          },
+          {
+            "from": "issup",
+            "to": "isuse",
+            "label": "select best",
+            "conditional": true
+          },
+          {
+            "from": "isuse",
+            "to": "end",
+            "label": "useful",
+            "conditional": true
+          },
+          {
+            "from": "isuse",
+            "to": "rewrite",
+            "label": "not useful",
+            "conditional": true,
+            "bend": 0.2
+          },
+          {
+            "from": "isuse",
+            "to": "limited",
+            "conditional": true
+          },
+          {
+            "from": "rewrite",
+            "to": "retrieve"
+          },
+          {
+            "from": "limited",
+            "to": "end",
+            "bend": 0.2
+          }
+        ],
+        "routes": [
+          {
+            "name": "direct answer",
+            "path": [
+              "decide",
+              "direct",
+              "isuse",
+              "end"
+            ]
+          },
+          {
+            "name": "retrieve · check · answer",
+            "path": [
+              "decide",
+              "retrieve",
+              "isrel",
+              "generate",
+              "issup",
+              "isuse",
+              "end"
+            ]
+          },
+          {
+            "name": "revise loop",
+            "path": [
+              "decide",
+              "retrieve",
+              "isrel",
+              "generate",
+              "issup",
+              "revise",
+              "issup",
+              "isuse",
+              "end"
+            ]
+          },
+          {
+            "name": "rewrite loop",
+            "path": [
+              "decide",
+              "retrieve",
+              "isrel",
+              "rewrite",
+              "retrieve",
+              "isrel",
+              "generate",
+              "issup",
+              "isuse",
+              "end"
+            ]
+          },
+          {
+            "name": "give up",
+            "path": [
+              "decide",
+              "retrieve",
+              "isrel",
+              "rewrite",
+              "retrieve",
+              "isrel",
+              "rewrite",
+              "retrieve",
+              "isrel",
+              "limited",
+              "end"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "title": "Corrective RAG",
+      "summary": "Grades what the retriever returns before trusting it. Weak context triggers a rewritten web search.",
+      "url": "https://github.com/vaibhav-barman/corrective-rag",
+      "featured": true,
+      "showcase": "flagship",
+      "category": "rag",
+      "tags": [
+        "LangGraph",
+        "LangChain",
+        "Gemini",
+        "Pinecone",
+        "Ollama",
+        "Tavily",
+        "Streamlit"
+      ],
+      "highlights": [
+        "A retrieval evaluator scores every chunk from 0 to 1: CORRECT above 0.7, INCORRECT when all are below 0.3, otherwise AMBIGUOUS.",
+        "Knowledge refinement: splits context into sentence strips, filters them, and recomposes before answering.",
+        "Answers come only from the refined context, with citations (file and page, or URL), and say so when context is insufficient.",
+        "All Gemini calls go through one batched path that retries 429s, 5xx errors and timeouts with backoff and jitter."
+      ],
+      "images": [],
+      "facts": [
+        {
+          "value": "0.7 / 0.3",
+          "label": "CORRECT / INCORRECT score thresholds"
+        },
+        {
+          "value": "3",
+          "label": "verdict routes"
+        },
+        {
+          "value": "6",
+          "label": "graph nodes"
+        }
+      ],
+      "graph": {
+        "nodes": [
+          {
+            "id": "retrieve",
+            "label": "retrieve",
+            "sub": "Pinecone, top-4",
+            "kind": "ring",
+            "wide": [4, 62],
+            "tall": [50, 3],
+            "tallLabel": "right",
+            "wideLabel": "below"
+          },
+          {
+            "id": "eval",
+            "label": "evaluator",
+            "sub": "scores chunks 0–1",
+            "kind": "ball",
+            "wide": [21, 62],
+            "tall": [50, 17],
+            "tallLabel": "right",
+            "wideLabel": "below"
+          },
+          {
+            "id": "rewrite",
+            "label": "rewrite query",
+            "sub": "search keywords",
+            "kind": "ring",
+            "wide": [30, 18],
+            "tall": [16, 36],
+            "tallLabel": "below",
+            "wideLabel": "above"
+          },
+          {
+            "id": "web",
+            "label": "web search",
+            "sub": "Tavily, 5 results",
+            "kind": "ring",
+            "wide": [58, 18],
+            "tall": [16, 53],
+            "tallLabel": "below",
+            "wideLabel": "above"
+          },
+          {
+            "id": "refine",
+            "label": "refine",
+            "sub": "filter → recompose",
+            "kind": "ball",
+            "wide": [67, 62],
+            "tall": [50, 66],
+            "tallLabel": "right",
+            "wideLabel": "below"
+          },
+          {
+            "id": "generate",
+            "label": "generate",
+            "sub": "cited answer",
+            "kind": "ring",
+            "wide": [84, 62],
+            "tall": [50, 81],
+            "tallLabel": "right",
+            "wideLabel": "below"
+          },
+          {
+            "id": "end",
+            "label": "END",
+            "kind": "ring",
+            "wide": [98, 62],
+            "tall": [50, 95],
+            "tallLabel": "right",
+            "wideLabel": "above"
+          }
+        ],
+        "edges": [
+          {
+            "from": "retrieve",
+            "to": "eval"
+          },
+          {
+            "from": "eval",
+            "to": "refine",
+            "label": "CORRECT · any chunk > 0.7",
+            "conditional": true,
+            "tallLabel": "CORRECT"
+          },
+          {
+            "from": "eval",
+            "to": "rewrite",
+            "label": "INCORRECT / AMBIGUOUS",
+            "conditional": true
+          },
+          {
+            "from": "rewrite",
+            "to": "web"
+          },
+          {
+            "from": "web",
+            "to": "refine"
+          },
+          {
+            "from": "refine",
+            "to": "generate"
+          },
+          {
+            "from": "generate",
+            "to": "end"
+          }
+        ],
+        "routes": [
+          {
+            "name": "CORRECT",
+            "path": [
+              "retrieve",
+              "eval",
+              "refine",
+              "generate",
+              "end"
+            ]
+          },
+          {
+            "name": "INCORRECT",
+            "path": [
+              "retrieve",
+              "eval",
+              "rewrite",
+              "web",
+              "refine",
+              "generate",
+              "end"
+            ]
+          },
+          {
+            "name": "AMBIGUOUS",
+            "path": [
+              "retrieve",
+              "eval",
+              "rewrite",
+              "web",
+              "refine",
+              "generate",
+              "end"
+            ]
+          }
+        ]
+      }
+    },
     {
       "title": "GitCommit AI",
       "summary": "An agentic, repository-aware Git commit assistant (git ai-commit) that learns how a repository writes commits and drafts messages in that style, checked by a deterministic critic before you see them.",
       "url": "https://github.com/vaibhav-barman/gitcommit-ai",
       "featured": true,
+      "showcase": "build",
       "category": "agentic",
       "tags": [
         "LangGraph",
@@ -84,13 +817,15 @@
           "to": 3,
           "label": "rejected"
         }
-      }
+      },
+      "solid": "icosahedron"
     },
     {
       "title": "LocalForge-AI",
       "summary": "An autonomous, local-first multi-agent software development and QA engine built with LangGraph and Ollama. It coordinates task specification, code generation, execution, and repair workflows on a local machine.",
       "url": "https://github.com/vaibhav-barman/localforge-ai",
       "featured": true,
+      "showcase": "build",
       "category": "agentic",
       "tags": [
         "LangGraph",
@@ -134,32 +869,51 @@
           "to": 2,
           "label": "repair"
         }
-      }
+      },
+      "solid": "dodecahedron"
     },
     {
-      "title": "PromptRoute",
-      "summary": "An LLM-native travel itinerary planner that generates structured, time-slotted travel plans using a local Ollama model and an interactive web interface.",
-      "url": "https://github.com/vaibhav-barman/promptroute",
+      "title": "Glossa",
+      "summary": "Ask questions about your own documents and read each answer next to the passages it came from. A RAG app built from raw parts, with no LLM framework.",
+      "url": "https://github.com/vaibhav-barman/Glossa",
       "featured": false,
-      "category": "llm",
+      "showcase": "build",
+      "category": "rag",
       "tags": [
-        "Ollama",
-        "Local LLMs",
-        "Structured output"
+        "FastAPI",
+        "PostgreSQL",
+        "Gemini",
+        "RAG",
+        "Tavily"
       ],
       "highlights": [
-        "Explores a Backend-as-a-Prompt architecture that returns structured JSON without a conventional application server or database.",
-        "Connects local model output to an interactive web frontend.",
-        "Designed for local inference without cloud API keys or per-token inference costs."
+        "Hybrid search fuses keyword and vector results with Reciprocal Rank Fusion, then reranks 20 candidates down to 5.",
+        "The agent calls tools: file search, a document-analysis sub-agent, read-only SQL with a 5-second limit, and optional web search.",
+        "Row-Level Security on every table."
       ],
       "images": [],
-      "shipped": "2026-10"
+      "facts": [
+        {
+          "value": "20 → 5",
+          "label": "candidates reranked to passages"
+        },
+        {
+          "value": "4",
+          "label": "agent tools"
+        },
+        {
+          "value": "RLS",
+          "label": "row-level security on every table"
+        }
+      ],
+      "solid": "stella"
     },
     {
       "title": "AI Payment Recovery Agent",
       "summary": "An AI agent prototype that classifies failed payments, selects a recovery strategy, simulates outcomes, and adapts later decisions using historical performance.",
       "url": "https://github.com/vaibhav-barman/recovery-agent",
       "featured": true,
+      "showcase": "build",
       "category": "agentic",
       "tags": [
         "AI Agents",
@@ -203,13 +957,37 @@
           "label": "learn"
         }
       },
-      "slug": "recovery-agent"
+      "slug": "recovery-agent",
+      "solid": "octahedron"
+    },
+    {
+      "title": "GNews MCP Server",
+      "summary": "A Model Context Protocol server that exposes news search and top-headline retrieval tools for AI assistants.",
+      "url": "https://github.com/vaibhav-barman/gnews-mcp-server",
+      "featured": false,
+      "showcase": "build",
+      "category": "tooling",
+      "tags": [
+        "MCP",
+        "FastMCP",
+        "Python",
+        "uv"
+      ],
+      "highlights": [
+        "Implements MCP tools for searching news articles and retrieving top headlines.",
+        "Supports configurable language, country, category, date range, sorting, and result limits.",
+        "Built in Python with FastMCP and managed with uv."
+      ],
+      "images": [],
+      "shipped": "2026-10",
+      "solid": "cube"
     },
     {
       "title": "Odyssey RAG",
       "summary": "A retrieval-augmented question-answering system that answers questions about Homer's The Odyssey using relevant passages retrieved from the source text.",
       "url": "https://github.com/vaibhav-barman/odyssey-rag",
       "featured": true,
+      "showcase": "build",
       "category": "rag",
       "tags": [
         "RAG",
@@ -252,13 +1030,35 @@
           "to": 1,
           "label": "evaluate"
         }
-      }
+      },
+      "solid": "tetrahedron"
+    },
+    {
+      "title": "PromptRoute",
+      "summary": "An LLM-native travel itinerary planner that generates structured, time-slotted travel plans using a local Ollama model and an interactive web interface.",
+      "url": "https://github.com/vaibhav-barman/promptroute",
+      "featured": false,
+      "showcase": null,
+      "category": "llm",
+      "tags": [
+        "Ollama",
+        "Local LLMs",
+        "Structured output"
+      ],
+      "highlights": [
+        "Explores a Backend-as-a-Prompt architecture that returns structured JSON without a conventional application server or database.",
+        "Connects local model output to an interactive web frontend.",
+        "Designed for local inference without cloud API keys or per-token inference costs."
+      ],
+      "images": [],
+      "shipped": "2026-10"
     },
     {
       "title": "Local YouTube Video Summarizer",
       "summary": "A privacy-focused tool that transcribes YouTube video audio and creates concise summaries using Whisper and a locally hosted language model through Ollama.",
       "url": "https://github.com/vaibhav-barman/youtube-video-summarizer",
       "featured": false,
+      "showcase": null,
       "category": "llm",
       "tags": [
         "Whisper",
@@ -275,30 +1075,11 @@
       "shipped": "2026-10"
     },
     {
-      "title": "GNews MCP Server",
-      "summary": "A Model Context Protocol server that exposes news search and top-headline retrieval tools for AI assistants.",
-      "url": "https://github.com/vaibhav-barman/gnews-mcp-server",
-      "featured": false,
-      "category": "tooling",
-      "tags": [
-        "MCP",
-        "FastMCP",
-        "Python",
-        "uv"
-      ],
-      "highlights": [
-        "Implements MCP tools for searching news articles and retrieving top headlines.",
-        "Supports configurable language, country, category, date range, sorting, and result limits.",
-        "Built in Python with FastMCP and managed with uv."
-      ],
-      "images": [],
-      "shipped": "2026-10"
-    },
-    {
       "title": "ApplyIQ",
       "summary": "An AI-powered job application intelligence platform that compares a candidate's resume with a job description to surface ATS compatibility, missing skills, and potential recruiter concerns.",
       "url": "https://github.com/vaibhav-barman/apply-iq",
       "featured": false,
+      "showcase": null,
       "category": "llm",
       "tags": [
         "Gemini",
@@ -320,6 +1101,7 @@
       "summary": "A Python application that extracts readable content from a webpage and uses Google's Gemini API to generate a concise Markdown summary.",
       "url": "https://github.com/vaibhav-barman/gemini-website-summarizer",
       "featured": false,
+      "showcase": null,
       "category": "llm",
       "tags": [
         "Gemini",
@@ -339,6 +1121,7 @@
       "summary": "A lightweight personal expense tracker built with Flask and SQLite, developed end to end with Claude Code as an agentic coding workflow.",
       "url": "https://github.com/vaibhav-barman/spendly",
       "featured": false,
+      "showcase": null,
       "category": "web",
       "tags": [
         "Flask",
@@ -364,12 +1147,31 @@
       "location": "India",
       "url": "https://www.bits-pilani.ac.in/",
       "degrees": [
-        "B.Sc. in Computer Science"
+        "B.S. in Computer Science"
       ],
       "honors": [],
       "gpa_cumulative": "7.99/10",
       "gpa_major": "",
       "graduation_date": "Expected 2027"
+    }
+  ],
+  "certifications": [
+    {
+      "name": "AI Engineer Bootcamp 2026"
+    },
+    {
+      "name": "Complete MCP Developer Guide"
+    },
+    {
+      "name": "Mastering Ollama"
+    },
+    {
+      "name": "Docker & Kubernetes Fundamentals",
+      "issuer": "Scaler Academy"
+    },
+    {
+      "name": "Deloitte Australia Data Analytics simulation",
+      "issuer": "Forage"
     }
   ],
   "skills": [
@@ -378,20 +1180,20 @@
       "items": [
         "Python",
         "SQL",
-        "MySQL",
         "PostgreSQL",
-        "SQLite"
+        "MySQL",
+        "SQLite",
+        "Neo4j / Cypher"
       ]
     },
     {
       "category": "LLM & Agent Frameworks",
       "items": [
-        "LangChain",
         "LangGraph",
+        "LangChain",
         "MCP",
         "FastMCP",
         "RAG",
-        "Local LLMs",
         "Ollama"
       ]
     },
@@ -409,6 +1211,8 @@
       "category": "Vector DB & Cache",
       "items": [
         "ChromaDB",
+        "FAISS",
+        "Pinecone",
         "Redis"
       ]
     },
@@ -422,10 +1226,6 @@
         {
           "name": "Alembic",
           "note": "migrations"
-        },
-        {
-          "name": "SlowAPI",
-          "note": "rate limiting"
         }
       ]
     },
